@@ -1,0 +1,28 @@
+\chapter{Technologies}
+This chapter aims to introduce valuable background knowledge of the technologies used in this thesis.
+
+\section{Internet of Things}
+\gls{iot} technology does not have a single unique definition. However \textcite{iot} define the term internet of things as follows:
+\begin{quote}
+    "An open and comprehensive network of intelligent objects that have the capacity to auto-organize, share information, data and resources, reacting and acting in face of situations and changes in the environment"
+\end{quote}
+While the internet in the traditional sense is about the data created by people, \gls{iot} is about data created by things. A practical example of this would be a smart heating system for a vacation home. Such a system is able to record and store data about environmental parameters such as temperature or humidity and make this data accessible in real-time on a smartphone through the internet. It is also possible to interact with this system through your phone. For example, it would be possible to start raising the temperature of a winter vacation home the night before arrival.
+
+This thesis aims to utilize an \gls{iot} device that is capable of recording and storing environmental parameters to monitor an artwork in transit.
+
+\section{Blockchain}
+Blockchain technology has long been determined a revolutionary and promising advancement in computer science. It describes a decentralized, distributed ledger that is tamper-evident and tamper-resistant and usually without a central authority. This technology allows a community of users to record transactions such that they cannot be changed once published. \parencite{blockchainoverview}
+
+These properties are able to reduce the importance of trust among single parties as the consensus of the whole network is necessary for a transaction to be published. This is why blockchain has been able to digitize processes that previously required trust in a central authority. The most prominent of which are cryptocurrencies like Bitcoin and Ethereum. \cite{bitcoin, ethereum}
+
+\subsection{Smart Contracts}
+Some blockchains can be extended and leveraged by smart contracts, which are essentially collections of code and data that are deployed on the blockchain network using cryptographically signed transactions. Nodes within the blockchain network execute the smart contract, and the results of execution are recorded on the blockchain. Users can create transactions that send data to public functions offered by a smart contract. The smart contract then executes the appropriate method to perform a service. Since the code is on the blockchain, it is tamper-evident and tamper resistant, making it a trusted third party. Smart contracts can perform various functions such as calculations, storing information, exposing properties, and automatically sending funds to other accounts. \parencite{blockchainoverview}
+
+\subsubsection{Non-fungible Token}
+An example of a smart contract standard would be the ERC-721 for \glspl{nft} on the Ethereum network~\cite{erc721}. \glspl{nft} are digital assets stored on a blockchain and represent a unique item or asset, such as a piece of artwork. 
+
+\section{Zero-knowledge Proofs}
+The fundamental concept of \glspl{zkp} has first been introduced by \textcite{goldwasserzkp}. In a \gls{zkp} a prover is proving a theorem a theorem to a probabilistic polynomial time verifier. \cite{zkpdefinitions} This is considered zero-knowledge if the verifier has been able to verify the theorem without gaining any information from the prover other than the validity of the theorem.
+
+\glspl{zkp} have been shown to be widely applicable in the field of cryptographic protocols. \cite{zkpexamples} Another use case is the implementation of \glspl{zkp} in the blockchain space to enable storing sensitive data on the public ledger without revealing any secrets.
+

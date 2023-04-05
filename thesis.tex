@@ -1,0 +1,131 @@
+\documentclass[12pt,a4paper,english,twoside]{book}
+\usepackage[german,main=english]{babel}
+\usepackage[T1]{fontenc} 
+\usepackage[latin1]{inputenc}
+\usepackage{csquotes}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage{epsfig}
+\usepackage{moreverb}
+\usepackage{rotating}
+\usepackage{enumerate}
+\usepackage{graphics, graphicx,wrapfig}
+\usepackage{fancybox}
+\usepackage{picinpar,varioref,floatflt}
+\usepackage{ae}
+\usepackage{longtable}
+\usepackage[hidelinks]{hyperref}
+\usepackage{textcomp}
+\usepackage{float}
+\usepackage{url}
+\usepackage{unizhdt}
+\usepackage[abbreviations, nonumberlist, shortcuts, automake]{glossaries-extra}
+\makeglossaries
+\input{abbreviations.tex}
+\input{glossary.tex}
+
+\usepackage[
+    backend=biber,
+    style=numeric,
+    natbib=false,
+    maxcitenames=2,
+    minbibnames=1, maxbibnames=99, 
+    url=false, 
+    doi=true,
+    ]{biblatex}
+\addbibresource{references.bib}
+
+\DeclareBibliographyDriver{misc}{%
+    \printnames{author}%
+    \newunit%
+    \printfield{year}%
+    \newunit%
+    \printfield{title}%
+    \newunit%
+    \printfield{url}%
+    \newunit%
+    \printfield{booktitle}% used to display last-accessed for websites due to a limitation of mendeley api
+    \finentry
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Define the language of the diploma thesis
+\selectlanguage{english}
+%\selectlanguage{german}
+
+\pagestyle{headings}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Define the author printed on the cover page
+\author{Jordi K\"uffer}
+% Define the city and country of the author
+\authorcity{Zurich, Switzerland}
+% Define the student ID (Matrikelnummer)
+\studentid{20-714-051}
+% Define the title with optional subtitle
+\title{Art Tracking with IoT and Blockchains}
+% Define the supervisors
+\supervisors{Dr. Eryk Schiller, Dr. Thomas Bocek, Prof. Dr. Burkhard Stiller}
+% Define the submission date
+\submissiondate{September 6th, 2023}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Make the title page
+\maketitle
+
+% Make the imprint on the back of the cover page
+\makeimprint
+
+\pagenumbering{roman}
+
+% Include the files of the diploma thesis
+%\cleardoublepage
+\input{chapters/abstract.tex}
+%\cleardoublepage
+\input{chapters/acknowledgments.tex}
+
+\tableofcontents
+
+\cleardoublepage
+\pagenumbering{arabic}
+
+\input{chapters/introduction.tex}
+
+\input{chapters/technologies.tex}
+
+\input{chapters/relatedwork.tex}
+
+\input{chapters/architecture_design.tex}
+
+\input{chapters/evaluation.tex}
+
+\input{chapters/summary.tex}
+
+\input{bibliography.tex}
+
+% Abbreviations
+\setglossarystyle{super}
+\printglossary[type=abbreviations, title=Abbreviations]
+\markboth{ABBREVIATONS}{}
+
+% Glossary
+\renewcommand{\glsnamefont}[1]{\textbf{#1}}
+\printglossary[title=Glossary]
+\markboth{GLOSSARY}{}
+
+%List of figures and tables
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
+
+\input{chapters/appendix.tex}
+
+\end{document}
