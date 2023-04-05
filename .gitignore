@@ -1,4 +1,5 @@
 scripts/**
-**/.$*.drawio.bkp
-**/.$*.drawio.dtmp
+*.drawio.bkp
+*.drawio.dtmp
 **/.DS_Store
+**/diagrams/.$Architecture.drawio.dtmp
