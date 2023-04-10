@@ -22,7 +22,7 @@
 \usepackage{float}
 \usepackage{url}
 \usepackage{unizhdt}
-\usepackage[abbreviations, nonumberlist, shortcuts, automake]{glossaries-extra}
+\usepackage[abbreviations, nonumberlist, shortcuts, automake, nogroupskip]{glossaries-extra}
 \makeglossaries
 \input{abbreviations.tex}
 \input{glossary.tex}
@@ -113,6 +113,8 @@
 
 % Abbreviations
 \setglossarystyle{super}
+% Remove the line below for no space between entries - remove nogroupskip from package options for grouping entries with the same starting letter
+\renewcommand*{\arraystretch}{2}
 \printglossary[type=abbreviations, title=Abbreviations]
 \markboth{ABBREVIATONS}{}
 
