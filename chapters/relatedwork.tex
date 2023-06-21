@@ -1,16 +1,43 @@
 \chapter{Related Work}
 In this chapter, we provide an overview of the existing literature related to art tracking with IoT and blockchains, highlighting previous research, methods, and findings related to the research question. Lastly, we also provide an overview of the state of the art in this field.
 
-\section{Blockchain Technology}
-Blockchain technology has been proposed as a promising solution to the challenges faced in the creative industry, such as issues related to the monetization of intellectual property but also the provenance and authenticity of creative work. \cite{creativeindustry} Especially technologies like smart contracts and \glspl{nft} have shown the potential of blockchain technology to revolutionize the art market by enabling greater transparency, accountability, and traceability. 
+\section{Existing Solutions using IoT and Blockchain}
+The combination of these two technologies in industrial systems and supply chains has been a "hot trend" in recent years. \cite{industryiot} 
 
-\section{NFTs in the Art World}
- \glspl{nft} have gained significant attention in the art world in recent years, with several high-profile sales of \gls{nft}-based artworks. \textcite{nftopportunities} has shown the benefits of \glspl{nft} protecting digital assets \textcite{creativeindustry} has suggested the application of \glspl{nft} beyond digital art, proposing to physically tag an \gls{iot} device to an artwork or sculpture. This could be used to transfer and track ownership while also potentially reducing intermediaries. \textcite{artchain} for example, developed a blockchain-based trading system for artworks. And \textcite{nftminter} has proposed a \gls{nft} Minter for a blockchain-based artwork trading system. Another related study by \textcite{zkdet} proposes a traceable and privacy-preserving data exchange scheme based on \gls{nft} and \gls{zkp}.
+\textcite{modum.io} present a solution to monitor necessary data during the transport of medical products. Upon delivery, the collected data is checked for compliance by a smart contract and then stored on the blockchain. There the data is immutable and verifiable by any party.
 
-\section{Existing Art Tracking Systems Using IoT and Blockchain}
-The combination of these two technologies in industrial systems and supply chains has been a "hot trend" in recent years. \cite{industryiot} Several companies and research groups are exploring the use of IoT and blockchains for art tracking and management.
+The proposed system is composed of back-end, front-end, and \gls{iot} sensor devices. The architecture and components of the system are shown in figure \ref{fig:modum.io}.
 
-For example, Artory \cite{artory} is tokenizing physical artworks to create a secure record of art pieces' provenance and ownership. \textcite{artrentalblockchain} developed an artwork rental system based on blockchain technology that is intended to facilitate the process of lending artwork collections. Another company that is incorporating \gls{iot} and blockchain technology is Everledger \cite{everledger}. Although they have been focused on other assets than artwork they also have discovered use cases that involve artwork tracking and authentication. Authena \cite{authena} is a swiss based company that is trying to protect the authenticity and traceability of physical assets. A study by \textcite{pactart} developed an \gls{iot} architecture called PACT-ART that employs advanced computing techniques like data mining and business process intelligence to predict a future state of the process and point out any possible violation from it.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{diagrams/modum_architecutre.png}
+    \caption{Modum.io AG Blockchain Architecture \cite{modum.io}}
+    \label{fig:modum.io}
+\end{figure}
 
+In addition to the Ethereum Blockchain Network, Modum.io uses a relational database to store raw temperature data and user credentials. The mobile clients are used to download the temperature data via Bluetooth from the sensors and submit it to the server which sends it to the \gls{sc} to evaluate the regulatory compliance and store the result \gls{on-chain}.
 
+\textcite{everledger}, is a digital transparency company, providing technology solutions to increase transparency in global supply chains. They use blockchain to track and verify the authenticity of high-value assets such as diamonds, wine, and art. Their platform allows users to track the entire lifecycle of an asset, from production to ownership, using a secure and transparent blockchain-based ledger. Everledger is mainly focused on fraud detection, verification, and provenance records by issuing digital certificates stored on a private blockchain.
 
+\textcite{authena}, is a Swiss-based company that provides a platform for tracking and verifying the authenticity of physical assets using blockchain technology and \gls{iot}. Their platform offers three main products:
+\begin{itemize}
+    \item AUTHENA SHIELD: A tamper-proof end-to-end authenticity solution.
+    \item AUTHENA L1VE: Real-time tracking of location and environmental conditions across countries and distribution channels.
+    \item AUTHENA M3TA: Creating a secure link between physical product and its twin in the Metaverse.
+\end{itemize}
+
+\section{Existing Art Tracking Solutions using IoT and Blockchain}
+Blockchain technology has been proposed as a promising solution to the challenges faced in the creative industry, such as issues related to the monetization of intellectual property but also the provenance and authenticity of creative work. \cite{creativeindustry} Especially technologies like smart contracts and \glspl{nft} have shown the potential of blockchain technology to revolutionize the art market by enabling greater transparency, accountability, and traceability.  
+
+\textcite{nftopportunities} has shown the benefits of \glspl{nft} protecting digital assets by proving the existence and ownership. \textcite{creativeindustry} has suggested the application of \glspl{nft} beyond digital art, proposing to physically tag an \gls{iot} device to an artwork or sculpture in order to transfer and track ownership. The \gls{iot} device is designed such that an attempt to tamper with the device will result in a blockchain record. This would potentially reduce intermediaries by providing a verifiable certificate that proves ownership, custodial-history and authenticity of a physical asset.
+
+\textcite{artchain} for example, developed a blockchain-based trading system for artworks that uses \glspl{nft} to represent physical artworks. Introducing traceability, irreversibility, and transparency into the art market. 
+
+In this regard, \textcite{nftminter} has proposed an advanced \gls{nft} Minter for a blockchain-based artwork trading system. 
+
+\textcite{artrentalblockchain} developed an artwork rental system based on blockchain technology that is intended to facilitate the process of lending artwork collections.
+% TODO: where to add this? Another related study by \textcite{zkdet} proposes a traceable and privacy-preserving data exchange scheme based on \gls{nft} and \gls{zkp}
+
+\textcite{artory}, is a company that is employing these concepts to tokenize physical artworks to create a secure record of art pieces' provenance and ownership. 
+
+The mentioned related work thus far has mainly shown the benefits of representing physical goods as digital \glspl{nft} on the blockchain. There is little work to be found on using IoT devices to monitor environmental parameters during the transportation of artworks. However, a study by \textcite{pactart} developed an \gls{iot} architecture called PACT-ART that employs advanced computing techniques like data mining and business process intelligence to predict a future state of the process and point out any possible violation from it. This system does not incorporate blockchain technology.
