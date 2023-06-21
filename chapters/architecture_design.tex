@@ -12,7 +12,7 @@ This project is considering a very specific scenario that involves the transport
 \end{figure}
 
 \subsection*{Goal}
-The goal is to create a minimal working system for artwork tracking, considering the following abstractions and the defined scenario. The system should allow the creation of an \gls{nft} associated with a piece of artwork as well as the storing, and retrieval of data on the \gls{nft}.
+The goal is to create a minimal working system for artwork tracking, considering the following abstractions and the defined scenario. The system should allow the creation of an \gls{nft} associated with a piece of artwork as well as the storing, and retrieval of data on the \gls{nft}. The actors are able to interact with the \gls{sc} via a \gls{rest} \gls{api} that is hosted on the internet. This \gls{api} provides an abstracted form of interaction that does not need a low-level understanding of the underlying blockchain components. Additionally the system includes a logging device that is programmed to record humidity and temperature data and report any deviations of a predefined threshold to the \gls{api}. 
 
 \subsection*{Summary of Abstractions}
 The real-world scenario of transferring custody of artwork for transportation is naturally much more complex and involves more actors \cite{artintransit}. However, in this work we are making the following abstractions:
@@ -29,8 +29,8 @@ Since the system is considering a very specific scenario This chapter aims to pr
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[height=0.5\textheight, keepaspectratio]{diagrams/Architecture.drawio.pdf}
-    \caption{High-Level architecture design}
+    \includegraphics[width=\textwidth, keepaspectratio]{diagrams/Architecture.drawio.pdf}
+    \caption{Proposed System Architecture}
     \label{fig:architecture}
 \end{figure}
 
