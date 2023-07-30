@@ -7,7 +7,7 @@ This project is designed for a scenario involving the transportation of sensitiv
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.8\textwidth]{diagrams/Scenario.drawio.pdf}
+    \includegraphics[width=0.8\textwidth]{diagrams/scenario.drawio.pdf}
     \caption{Defined scenario for the system to consider}
     \label{fig:scenario}
 \end{figure}
@@ -34,7 +34,7 @@ Since the system is considering a very specific scenario This chapter aims to pr
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=\textwidth, keepaspectratio]{diagrams/Architecture.drawio.pdf}
+    \includegraphics[width=\textwidth, keepaspectratio]{diagrams/architecture.drawio.pdf}
     \caption{System Architecture}
     \label{fig:architecture}
 \end{figure}
@@ -59,22 +59,37 @@ Apart from the specified external actors of the system, there are also technical
 The \gls{iot} device is responsible for recording temperature and humidity data while the artwork is in transit. It will evaluate the data against a predefined threshold and report any violation to the system. It will interact with the system via the \gls{api} provided by the backend server. It will not interact with the \gls{sc} directly. However the logger is also represented by an Ethereum account and equipped with a key pair. This will be used for authentication and authorization by signing a message.
 
 \subsubsection{Blockchain}
-The blockchain component of the system consists of two sub components. To interact with the blockchain a \gls{rpc} endpoint is needed. This endpoint can be used by the backend server to submit transactions that are used to interact with the \gls{sc}. The second component is the \gls{sc} itsself. It will in charge of defining the \gls{nft} representation of the artwork. Additionally it stores relevant data associated with the artwork and enforces a role-based authorization that controls the available permission sets of each user. Specifically this means read access will be granted to \textit{carriers} and \textit{recipients} while write access is reserved for the \textit{owner}. It will also handle the multi-approval process necessary for updating the status and changing custody while transporting an artwork.
+The blockchain component of the system consists of two sub components. To interact with the blockchain a \gls{rpc} endpoint is needed. This endpoint can be used by the backend server to submit transactions that are used to interact with the \gls{sc}.
+
+The second component is the \gls{sc} itself. It will in charge of defining the \gls{nft} of the artwork. %Additionally it stores relevant data associated with the artwork and enforces a role-based authorization that controls the available permission sets of each user. Specifically this means read access will be granted to \textit{carriers} and \textit{recipients} while write access is reserved for the \textit{owner}. It will also handle the multi-approval process necessary for updating the status and changing custody while transporting an artwork.
+The functionality provided by the \gls{sc} is defined as follows:
+
+\begin{itemize}[align=left, font=\textit]
+    \item[minting:] A new user can create a \gls{nft} of their artwork by entering relevant information about the artwork and the outstanding transportation process.
+    \item[storing data:] 
+    \item[updating data:]
+\end{itemize}
 
 \subsubsection{Backend Server}
-The backend server is in charge of providing an abstracted form of interaction to the \gls{sc} by providing a \gls{rest} \gls{api}. It is also responsible to handle authentication which proofs that incoming requests are made by the actors which are owners of the Ethereum accounts associated with certain roles. 
+The backend server is in charge of providing an abstracted form of interaction to the \gls{sc} by providing a \gls{rest} \gls{api}. Like the actors and the logger the backend server is also represented by an Ethereum account. This account is used to deploy the \gls{sc} and acts as a sole point of access to it. Every transaction is issued by this account. The backend server is also responsible for handling authentication which is designed to proof that incoming requests are made by the actors which are owners of the Ethereum accounts associated with certain roles.
 
-\begin{figure}[ht]
+\paragraph{Authentication}
+
+\begin{wrapfigure}{o}{0.6\textwidth}
     \centering
-    \includegraphics[width=\textwidth, keepaspectratio]{diagrams/authentication_flow.drawio.pdf}
+    \includegraphics[width=0.59\textwidth, keepaspectratio]{diagrams/authentication_flow.drawio.pdf}
     \caption{Authentication flow}
     \label{fig:auth_flow}
-\end{figure}
+\end{wrapfigure}
 
 The authentication flow visualized in Figure \ref{fig:auth_flow} is using signature verification of cryptographically signed messages to proof ownership over an Ethereum account. To do this a challenge message is generated upon authentication request. This message contains relevant information to the session such as start of the session, duration of the session and for which account the session is created. The message is then signed by the private key of the requester's wallet and sent back. The signature can then be verified against the recovered address and if request address and recovered address match, this proofs that the request was made by an actor which is owner of the private key corresponding to the account, assuming that the private key was not compromised.
 
-\subsubsection{Frontend}
+\paragraph{Features}
+In addition to exposing the features of the \gls{sc}, the server \gls{api} should expose a defined set of features:
 
+
+\subsubsection{Frontend}
+While to simplify the interaction with the system we include a user interface. The frontend should especially simplify the authentication flow by integrating popular blockchain wallets to sign messages and allow the login with wallet functionality. Therefore it should afford to create an authenticated session with users and provide a graphical interface to the backend server \gls{api}.
 
 \begin{itemize}[align=left,font=\itshape]
     \item[Logger:] \gls{iot} Device responsible for recording environmental data while the artwork is in transit. The device will be programmed such that it is able to evaluate whether a predefined threshold has been exceeded to then report a violation to the \gls{api}. It is also managing its own key pair to authenticate by signing messages.
