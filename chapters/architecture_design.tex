@@ -6,16 +6,16 @@ This chapter describes the application scenario in section \ref{sec:scenario_def
 This project is designed for a scenario involving the transportation of sensitive pieces of artwork from one place to another. More specifically a \textit{sender} is handing custody of the artwork to a \textit{carrier} who is responsible to transport the artwork safely to a \textit{recipient}. This means the \textit{carrier} is responsible for controlling the transportation environment such that any damages can be prevented. Upon arrival, the artwork's custody is transferred to the \textit{recipient}, and the process is finished.
 
 \begin{figure}[ht]
+    \label{fig:scenario}
     \centering
     \includegraphics[width=0.8\textwidth]{diagrams/scenario.drawio.pdf}
     \caption{Defined scenario for the system to consider}
-    \label{fig:scenario}
 \end{figure}
 
 The \textit{sender} of the artwork registers the artwork on the system and inputs relevant information to the application. The system returns an artwork identifier which can be used to retrieve details about the artwork. Before the item is handed over for transportation, the \textit{sender} registers the \textit{carrier} and the \textit{recipient} by adding their corresponding wallet addresses to the system. This allows the other actors to retrieve details about the artwork and interact with the system. A logging device is also registered in the same manner which records and stores environmental data, specifically temperature and humidity, during transportation to be audited by the actors. The logger is set up with a defined threshold specific to the artwork. It will report any violation of this threshold to the system automatically. Once the actors are registered and the logger is set up, both the \textit{carrier} and the \textit{sender} must verify the integrity of the artwork and initiate the request for a status change to "in transit". After which the \textit{carrier} will transport the artwork to its destination where the integrity of the artwork is verified by both the \textit{carrier} and \textit{recipient} and the status is changed to "delivered". If any violation occurred during the transportation the timestamp of the most recent one will be visible for all associated actors in the system.
 
 \subsection*{Goal}
-The goal is to create a minimal working system for artwork tracking, considering the following abstractions and the defined scenario. The system should allow the creation of an \gls{nft} associated with a piece of artwork as well as the storing, and retrieval of data on the \gls{nft}. The actors are able to interact with the \gls{sc} via a \gls{rest} \gls{api} that is hosted on the internet. This \gls{api} provides an abstracted form of interaction that does not need a low-level understanding of the underlying blockchain components. Additionally, the system includes a logging device that is programmed to record humidity and temperature data and report any deviations of a predefined threshold to the \gls{api}. Finally the system should provide a user interface that allows actors to log in with their Ethereum account and interact with the system.
+The goal is to create a minimal working system for artwork tracking, considering the following abstractions and the defined scenario. The system should allow the creation of an \gls{nft} associated with a piece of artwork as well as the storing, and retrieval of data on the \gls{nft}. The actors are able to interact with the \gls{sc} via a \gls{rest} \gls{api} that is hosted on the internet. This \gls{api} provides an abstracted form of interaction that does not need a low-level understanding of the underlying blockchain components. Additionally, the system includes a logging device that is programmed to record humidity and temperature data and report any deviations of a predefined threshold to the \gls{api}. Finally, the system should provide a user interface that allows actors to log in with their Ethereum account and interact with the system.
 
 \subsection*{Summary of Abstractions}
 The real-world scenario of transferring custody of artwork for transportation is naturally much more complex and involves more actors \cite{artintransit}. However, in this work we are making the following abstractions:
@@ -33,13 +33,13 @@ The real-world scenario of transferring custody of artwork for transportation is
 Since the system is considering a very specific scenario This chapter aims to provide a high-level overview of the architecture of the system while later going into detail about its components and actors. From now on we will call the artwork tracking system \texttt{ARTIS}.
 
 \begin{figure}[ht]
+    \label{fig:architecture}
     \centering
     \includegraphics[width=\textwidth, keepaspectratio]{diagrams/architecture.drawio.pdf}
     \caption{System Architecture}
-    \label{fig:architecture}
 \end{figure}
 
-This architecture was designed using a top-down design approach, with the initial step of building a server application that is able to interact with the \gls{sc}. In the implementation phase we then added the specific functionality that is needed to support the defined scenario. In Figure \ref{fig:architecture} you can see the final architecture of the system. 
+This architecture was designed using a top-down design approach, with the initial step of building a server application that is able to interact with the \gls{sc}. In the implementation phase, we then added the specific functionality that is needed to support the defined scenario. In Figure \ref{fig:architecture} you can see the final architecture of the system. 
 
 \subsection{Actors}
 As already introduced in the section \nameref{sec:scenario_definition}, the system is designed for three actors. Each of the actors is represented by an Ethereum account which is used for authentication and authorization. The actors are defined as follows.
@@ -53,25 +53,42 @@ As already introduced in the section \nameref{sec:scenario_definition}, the syst
 \end{itemize}
 
 \subsection{Technical Components}
-Apart from the specified external actors of the system, there are also technical components to consider.
+Apart from the specified external actors of the system, there are also technical components to consider. The main components of the system are visually separated by colored areas in Figure \ref{fig:architecture}.
 
-\subsubsection{Logger}
-The \gls{iot} device is responsible for recording temperature and humidity data while the artwork is in transit. It will evaluate the data against a predefined threshold and report any violation to the system. It will interact with the system via the \gls{api} provided by the backend server. It will not interact with the \gls{sc} directly. However the logger is also represented by an Ethereum account and equipped with a key pair. This will be used for authentication and authorization by signing a message.
+\subsubsection{IoT Device}
+The logging device is responsible for recording temperature and humidity data while the artwork is in transit. It will evaluate the data against a predefined threshold and report any violation to the system. It will interact with the system via the \gls{api} provided by the backend server. It will not interact with the \gls{sc} directly. However, the logger is also represented by an Ethereum account and equipped with a key pair. This will be used for authentication by signing a message.
 
 \subsubsection{Blockchain}
-The blockchain component of the system consists of two sub components. To interact with the blockchain a \gls{rpc} endpoint is needed. This endpoint can be used by the backend server to submit transactions that are used to interact with the \gls{sc}.
+The blockchain component of the system consists of two sub-components. To interact with the blockchain a \gls{rpc} endpoint is needed. This endpoint can be used by the backend server to submit transactions that are used to interact with the \gls{sc}.
 
-The second component is the \gls{sc} itself. It will in charge of defining the \gls{nft} of the artwork. %Additionally it stores relevant data associated with the artwork and enforces a role-based authorization that controls the available permission sets of each user. Specifically this means read access will be granted to \textit{carriers} and \textit{recipients} while write access is reserved for the \textit{owner}. It will also handle the multi-approval process necessary for updating the status and changing custody while transporting an artwork.
+The second component is the \gls{sc} itself. It will be in charge of defining the \gls{nft} of the artwork. 
 The functionality provided by the \gls{sc} is defined as follows:
 
 \begin{itemize}[align=left, font=\textit]
     \item[minting:] A new user can create a \gls{nft} of their artwork by entering relevant information about the artwork and the outstanding transportation process.
-    \item[storing data:] 
-    \item[updating data:]
+    \item[retrieving data:] Users are able to retrieve stored data from the \gls{sc}.
+    \item[updating data:] Users can update the stored data.
 \end{itemize}
 
+The \gls{sc} enforces a role-based authorization that controls the available permission sets of each user. Specifically, this means read access will be granted to \textit{carriers} and \textit{recipients}, while write access, is reserved for the \textit{owner}. It will also handle the multi-approval process necessary for updating the status and changing custody upon transportation of the artwork. An overview of the available permission sets of each actor can be found in Table \ref{tab:permission_sets}
+
+\begin{table}
+\begin{tabular}{l|ccccc}
+\textbf{Function}          & \textbf{unregistered} & \textbf{owner}       & \textbf{recipient}   & \textbf{carrier}     & \textbf{logger}      \\ \hline
+                           & \multicolumn{1}{l}{}  & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} \\
+Get artwork data           & ✗                     & ✓                    & ✓                    & ✓                    & ✗                    \\
+Update roles               & ✗                     & ✓                    & ✗                    & ✗                    & ✗                    \\
+Update violation timestamp & ✗                     & ✗                    & ✗                    & ✗                    & ✓                    \\
+Update requested status    & ✗                     & ✓                    & ✓                    & ✓                    & ✗                    \\
+Update current Status      & ✗                     & ✗                    & ✗                    & ✗                    & ✗                    \\
+Update data fields         & ✗                     & ✓                    & ✗                    & ✗                    & ✗                   
+\end{tabular}
+\caption{Available permission sets to registered roles}
+\label{tab:permission_sets}
+\end{table}
+
 \subsubsection{Backend Server}
-The backend server is in charge of providing an abstracted form of interaction to the \gls{sc} by providing a \gls{rest} \gls{api}. Like the actors and the logger the backend server is also represented by an Ethereum account. This account is used to deploy the \gls{sc} and acts as a sole point of access to it. Every transaction is issued by this account. The backend server is also responsible for handling authentication which is designed to proof that incoming requests are made by the actors which are owners of the Ethereum accounts associated with certain roles.
+The backend server is designed to provide an abstracted form of interaction to the \gls{sc} by exposing a \gls{rest} \gls{api}. Like the actors and the logger, the backend server is also represented by an Ethereum account. This account is used to deploy the \gls{sc} and acts as the sole point of access to it. Every transaction is issued by this account. The backend server is also responsible for handling authentication which is designed to prove that incoming requests are made by the actors who are owners of the Ethereum accounts associated with certain roles.
 
 \paragraph{Authentication}
 
@@ -82,21 +99,10 @@ The backend server is in charge of providing an abstracted form of interaction t
     \label{fig:auth_flow}
 \end{wrapfigure}
 
-The authentication flow visualized in Figure \ref{fig:auth_flow} is using signature verification of cryptographically signed messages to proof ownership over an Ethereum account. To do this a challenge message is generated upon authentication request. This message contains relevant information to the session such as start of the session, duration of the session and for which account the session is created. The message is then signed by the private key of the requester's wallet and sent back. The signature can then be verified against the recovered address and if request address and recovered address match, this proofs that the request was made by an actor which is owner of the private key corresponding to the account, assuming that the private key was not compromised.
+The authentication flow visualized in Figure \ref{fig:auth_flow} is using signature verification of cryptographically signed messages to prove ownership over an Ethereum account. To do this a challenge message is generated upon authentication request. This message contains relevant information to the session such as the start of the session, the duration of the session, and for which account the session is created. The message is then signed by the private key of the requester's wallet and sent back. The signature can then be verified against the recovered address and if the requested address and recovered address match, this proves that the request was made by an actor who is the owner of the private key corresponding to the account, assuming that the private key was not compromised.
 
 \paragraph{Features}
-In addition to exposing the features of the \gls{sc}, the server \gls{api} should expose a defined set of features:
-
+In addition to enabling the features of the \gls{sc}, and managing authentication, the server will also validate incoming requests and provide meaningful error messages to the user.
 
 \subsubsection{Frontend}
-While to simplify the interaction with the system we include a user interface. The frontend should especially simplify the authentication flow by integrating popular blockchain wallets to sign messages and allow the login with wallet functionality. Therefore it should afford to create an authenticated session with users and provide a graphical interface to the backend server \gls{api}.
-
-\begin{itemize}[align=left,font=\itshape]
-    \item[Logger:] \gls{iot} Device responsible for recording environmental data while the artwork is in transit. The device will be programmed such that it is able to evaluate whether a predefined threshold has been exceeded to then report a violation to the \gls{api}. It is also managing its own key pair to authenticate by signing messages.
-    
-    \item[Blockchain:] Decentralized, distributed ledger that stores transactions or data in a secure, tamper-resistant, and tamper-evident fashion. The blockchain can be used to create and track \glspl{nft}, their ownership and provenance as well as the data.
-    
-    \item[Smart Contract:] Defines the digital representation of the artwork as a \gls{nft}. Specifies which artwork data is stored on-chain and implements a policy-based authorization to control access to the data.
-    
-    \item[Backend Server:] Provides a \gls{rest} \gls{api} to interact with the \gls{sc} while also authenticating incoming requests. It is the sole point of access to the \gls{sc} and signs all the transactions submitted to the blockchain.
-\end{itemize}
+To simplify the interaction with the system we included a user interface in the system. The frontend presentation layer is a web application that is specially designed to simplify the authentication flow by integrating popular blockchain wallets to sign messages and allow the login with wallet functionality. Therefore it should afford to easily guide the user through the authentication flow and provide a graphical interface to the backend server \gls{api}.

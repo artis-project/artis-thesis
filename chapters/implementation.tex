@@ -1,5 +1,5 @@
 \chapter{Implementation}
-This chapter highlights the implementational aspects of the system. Introducing the technologies used to build the components. Each section is referring to its respective GitHub repository of the \texttt{ARTIS-project}\footnote{\href{https://github.com/artis-project/}{https://github.com/artis-project/}} GitHub organization.
+This chapter highlights the implementational aspects of the system. Introducing the technologies used to build the components. Each section title is referring to its respective GitHub repository of the \texttt{ARTIS-project}\footnote{\href{https://github.com/artis-project/}{https://github.com/artis-project/}} GitHub organization.
 
 \section{artis-rockpi-logger}
 
@@ -10,12 +10,11 @@ This chapter highlights the implementational aspects of the system. Introducing 
     \label{fig:rock-pi}
 \end{wrapfigure}
 
-For this project, we used a Rock Pi \footnote{\href{https://rockpi.org/rockpi4}{https://rockpi.org/rockpi4}} with a DHT-22\footnote{\href{https://www.adafruit.com/product/385}{https://www.adafruit.com/product/385}} sensor attached. (figure \ref{fig:rock-pi})
+For this project, we used a Rock Pi \footnote{\href{https://rockpi.org/rockpi4}{https://rockpi.org/rockpi4}} with a DHT-22\footnote{\href{https://www.adafruit.com/product/385}{https://www.adafruit.com/product/385}} sensor attached. (Figure \ref{fig:rock-pi})
 
 The decision for this device and sensor is based on simplicity and flexibility as well as on low acquisition costs. The Rock Pi is compatible with Linux operating systems which makes it very simple to write scripts using high-level programming languages like Python. It also has \gls{gpio} support to easily connect the DHT-22 sensor. The sensor is capable of recording temperature and humidity data from the environment.
 
-\subsection{Sensor Interface}
-\begin{wrapfigure}{O}{0.4\textwidth}
+\begin{figure}
     \centering
     \begin{forest}
       for tree={
@@ -42,7 +41,7 @@ The decision for this device and sensor is based on simplicity and flexibility a
       ]
       [artis\_api.py
       ]
-      [jwt.py
+      [authenticator.py
       ]
       [logging\_script.py
       ]
@@ -52,16 +51,147 @@ The decision for this device and sensor is based on simplicity and flexibility a
     \end{forest}
     \caption{Filetree of the artis-rockpi-logger repository}
     \label{fig:artis-logger-filetree}
-\end{wrapfigure}
-To read data from the DHT-22 sensor we used an existing library called Rockfruit\_Python\_DHT\footnote{\href{https://github.com/Tim-J-Parbs/Rockfruit_Python_DHT}{https://github.com/Tim-J-Parbs/Rockfruit\_Python\_DHT}}. The library provides a function with the signature \texttt{read\_retry(sensor, pin, retries=15, delay\_seconds=2)}. This method reads data from the DHT sensor of the specified type (in our case 22) on the specified \gls{gpio} pin and returns a tuple of humidity (as a floating point value in percent) and temperature (as a floating point value in Clesius). The function will attempt to read multiple times (up to the specified retries) until a reading can be registered. If no reading can be registered after the amount of retries the function will return \texttt{(None, None)}. The default delay between retries is two seconds, but can be overridden.
+\end{figure}
+
+\subsection{Sensor Interface}
+To read data from the DHT-22 sensor we used an existing library called Rockfruit\_Python\_DHT\footnote{\href{https://github.com/Tim-J-Parbs/Rockfruit_Python_DHT}{https://github.com/Tim-J-Parbs/Rockfruit\_Python\_DHT}} that we adapted slightly to work with our board. The library provides a function with the signature \texttt{read\_retry(sensor, pin, retries=15, delay\_seconds=2)}. This method reads data from the DHT sensor of the specified type (in our case 22) on the specified \gls{gpio} pin and returns a tuple of humidity (as a floating point value in percent) and temperature (as a floating point value in Celsius). The function will attempt to read multiple times (up to the specified retries) until a reading can be registered. If no reading can be registered after the amount of retries the function will return \texttt{(None, None)}. The default delay between retries is two seconds but can be overridden.
+
+\lstinputlisting[
+    language=Python,
+    caption=Temperature and humidity logging loop in \texttt{logging\_script.py},
+    label=lst:loggingscript
+]{codesnippets/logging_script.py}    
+
+In Listing \ref{lst:loggingscript} you can see the that the script is executing the \texttt{read\_retry} function in an endless loop and whenever the reading has been successful it stores the data along with a timestamp of the reading in seconds and in a readable format in a local database.
+
+The logger contains a second important script which is run simultaneously. The \texttt{violation\_script.py} is executed with the predefined temperature and humidity thresholds and the corresponding artwork id.
+
+\lstinputlisting[
+    language=bash,
+    caption=Executing the \texttt{violation\_script.py},
+    label=lst:violationscript,
+    xleftmargin=2cm,
+    xrightmargin=2cm
+]{codesnippets/violation_script.py}
+
+This script contains another while loop that continuously checks for new entries in the database and evaluates whether the threshold has been exceeded. If there has been either a temperature or humidity violation the script calls the corresponding method to call the \texttt{ARTIS} server \gls{api}. These methods are defined in the \texttt{artis\_api.py} file.
+
+To authenticate to the \gls{api}, the logger follows the same authentication flow illustrated in Figure \ref{fig:auth_flow}. The methods used to send the authentication requests and sign the challenge message are defined in the \texttt{authenticator.py} file.
 
 \section{artis-smartcontract}
-The \gls{sc} was written in Ethereums native programming language Solidity \cite{solidity}. The contract was developed using hardhat \cite{hardhat}, a development environment for Ethereum. Hardhat makes it easy to develop, compile, test and deploy smartcontracts. The \gls{sc} has been deployed to the Ethereum Testnet Sepolia \cite{sepolia} during development, but is intended to be deployed on the Mainnet in production. 
+
+The \gls{sc} was written in Ethereum's native programming language Solidity \cite{solidity}. The contract was developed using hardhat \cite{hardhat}, a development environment for Ethereum. Hardhat makes it easy to develop, compile, test, and deploy smart contracts. The \gls{sc} has been deployed to the Ethereum testnet Sepolia \cite{sepolia} during development, but is intended to be deployed on the mainnet in production. The Ethereum blockchain was selected due to prior experience of the research group and the author.
+
+When the \gls{sc} is first deployed the smartcontract admin is set to the deploying address. This address will be the only point of access to any \gls{sc} function. It is also the account used by the server to interact with the \gls{sc} and sign transactions.
+
+\lstinputlisting[
+    language=Solidity,
+    caption=\gls{sc} constructor function,
+    label=lst:scconstructor,
+    firstline=53,
+    lastline=55
+]{codesnippets/smartcontract.sol}
+
+As seen in Listing \ref{lst:scconstructor} the \gls{sc} extends the ERC721 \cite{erc721} contract which provides the \gls{nft} interface.
+
+\subsection{Data Structures}
+To understand the rest of the contract we will explain the data structures used in more detail.
+
+\subsubsection{Structs}
+To satisfy the artwork tracking use case three additional structs have been defined as seen in Listing \ref{lst:scstructs}. The \texttt{ArtworkData} struct contains all information about a specific artwork. This includes the addresses of each actor as well as the violation timestamp and the status of the artwork. The status field in turn contains to fields as defined in the \texttt{Status} struct. They are used to support the multi-approval process when it comes to changing the status of an artwork. To match the physical artwork with the \gls{nft} we also included an objectID field. The \texttt{ArtworkData} struct can be extended with more data fields if needed.
+
+The \texttt{StatusApprovals} struct is used to store which of the actors has already approved a status change. The logic behind this multi-approval process will be explained in detail later.
+
+\lstinputlisting[
+    language=Solidity,
+    caption=\gls{sc} structs,
+    label=lst:scstructs,
+    firstline=1,
+    lastline=20
+]{codesnippets/smartcontract.sol}
+
+\subsubsection{Enums}
+The \gls{sc} defines one enum that is used to define the different status values that exist. Enums help during development as they prevent misspellings or other types of errors.
+
+\lstinputlisting[
+    language=Solidity,
+    caption=\gls{sc} enums,
+    label=lst:scenums,
+    firstline=22,
+    lastline=27
+]{codesnippets/smartcontract.sol}
+
+\subsubsection{Mappings}
+The \texttt{artworks} mapping is used to map artwork ids to \texttt{ArtworkData} structs. This mapping is used to store the references to each new artwork. Similarly the \texttt{approvals} mapping is used to store and manage the approval data of an artwork. Put simply, this mapping can answer the question of who has approved a certain status of a specific artwork.
+
+\lstinputlisting[
+    language=Solidity,
+    caption=\gls{sc} mappings,
+    label=lst:scmappings,
+    firstline=29,
+    lastline=32
+]{codesnippets/smartcontract.sol}
+
+\textit{e.g.} \texttt{approvals[1][StatusValue.IN\_TRANSIT].carrier} is \texttt{true} if and only if the carrier has already approved to change the artwork status of artwork $1$ to IN\_TRANSIT.
 
 
-A decentralized, distributed ledger that stores transactions or data in a secure, tamper-resistant, and tamper-evident fashion. The blockchain can be used to create and track \glspl{nft}, their ownership and provenance as well as the data associated with it. For this project we selected the Ethereum network due to prior experience of the research group and the author. 
+\subsubsection{Function Modifiers}
+In Solidity we can define function modifiers, that can be used to prepend functionality to a function. If a function modifier is used in a function the code in the modifier is executed beforehand. For instance this can be used to perform a check before a function is run. Function modifiers can be reused on multiple functions and thus introduce cleaner and less redundant code.
 
-The blockchain component consists of an Ethereum full-node that provides a \gls{rpc} endpoint and a \gls{sc}, which will be written in solidity. For simplicity, the project will take advantage of a managed full-node and not provide its own.
+\lstinputlisting[
+    language=Solidity,
+    caption=\gls{sc} modifiers,
+    label=lst:scmodifiers1,
+    firstline=81,
+    lastline=121
+]{codesnippets/smartcontract.sol}
 
+The modifiers in Listing \ref{lst:scmodifiers1} are used to check if a caller is authorized to call a specific function. If the call is forbidden the transaction is reverted with an appropriate error message. The last three characters of each error message represent the corresponding \gls{http} status code. This status code is directly forwarded by the server \gls{api} in case of an error.
+
+To ensure that all \gls{sc} interaction is done through the server \gls{api} we modified every public function with the \texttt{onlyAdmin} modifier. The \texttt{read} modifier is additionally added to each function that reads data from the \gls{sc}. There we check that the wallet that authenticated a request to the server \gls{api} is registered as an actor with read permissions.
+
+Similarly we defined the \texttt{write} modifier to check that certain \texttt{ArtworkData} fields are only modified by the owner or logger respectively. The \texttt{currentStatus} field cannot be modified at all, it is updated automatically once the actors approved a status change. The detailed permission sets of each actor can be found in Table \ref{tab:permission_sets} 
+
+\subsection{Functions}
+To support the functionality designed in Section \ref{sec:overview} the contract implements three main fucntions
+
+\subsubsection{safeMint}
+
+\subsubsection{updateArtworkData}
+The data associated with an artwork can be updated by calling this function. The implementation of this function allows to update many fields at once. This has some advantages:
+\begin{itemize}[align=left, font=\itshape]
+    \item[simplified interface:] Using only one update function instead of exposing an update function for each field reduces the number of public functions. This results in a more understandable and usable contract.
+    \item[atomic updates:] If an error occurs during the execution of this function the transaction as a whole is reverted, resulting in the initial state of the contract. This maintains data consitency and prevents partial updates.
+    \item[reduced costs:] The possibility to update multiple fields at once reduces the number of transactions that need to be submitted and in turn reduces execution costs.
+\end{itemize}
+
+\lstinputlisting[
+    language=Solidity,
+    caption=\gls{sc} updateArtworkData function,
+    label=lst:scupdate,
+    firstline=123,
+    lastline=137
+]{codesnippets/smartcontract.sol}
+
+The \texttt{updateArtworkData} expects the updated data as parameter of the type ArtworkData. Solidity expects every field of the \texttt{data} parameter to be populated. This is why we check for each field if the value should be updated and in turn execute the according update. For string fields this check is done by checking the length of the incoming string. An empty string with length $0$ indicates that the user did not update this field. The same check is not possible with addresses. This is why we decided to use the address $0$x$00...001$ to mark an empty address update field. The zero address $(0$x$0)$ is reserved to remove an address from a field.
+
+The code executed if the update conditions evaluate to true differ in complexity. For the \texttt{violationTimestamp} field it is as simple as executing: 
+\begin{lstlisting}[language=Solidity]
+    artworks[data.id].violationTimestamp = data.violationTimestamp
+\end{lstlisting}
+
+However the logic behind updating the status is more complex. The update status request is visualized in Figure \ref{fig:update_status}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth, keepaspectratio]{diagrams/update_status.drawio.pdf}
+    \caption{Multi-approval status update flow}
+    \label{fig:update_status}
+\end{figure}
+
+\subsubsection{getArtworkData}
 
 \section{artis-server}
+
+
+\section{artis-frontend}
