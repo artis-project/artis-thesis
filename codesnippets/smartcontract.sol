@@ -121,17 +121,28 @@ modifier write(address sender, ArtworkData memory data) {
 }
 
 function updateArtworkData(ArtworkData memory data, address sender)
-        public
-        onlyAdmin
-        exists(data.id)
-        write(sender, data)
-    {
-        if (data.violationTimestamp != 0) { ... }
-        if (bytes(data.status.requestedStatus).length != 0) { ... }
-        if ((bytes(data.objectId).length != 0)) { ... }
-        if (data.carrier != address(1)) { ... }
-        if (data.recipient != address(1)) { ... }
-        if (data.logger != address(1)) { ... }
+  public
+  onlyAdmin
+  exists(data.id)
+  write(sender, data)
+{
+  if (data.violationTimestamp != 0) { ... }
+  if (bytes(data.status.requestedStatus).length != 0) { ... }
+  if ((bytes(data.objectId).length != 0)) { ... }
+  if (data.carrier != address(1)) { ... }
+  if (data.recipient != address(1)) { ... }
+  if (data.logger != address(1)) { ... }
 
-        emit Updated( ... );
-    }
+  emit Updated( ... );
+}
+
+function safeMint(address to, ArtworkData memory data)
+  public
+  onlyAdmin 
+{
+  totalSupply.increment(); // start ids at 1
+  uint256 tokenId = totalSupply.current();
+  _safeMint(to, tokenId);
+  ArtworkData memory newArtwork = ArtworkData({ ... });
+  artworks[tokenId] = newArtwork;
+}

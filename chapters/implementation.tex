@@ -153,15 +153,27 @@ To ensure that all \gls{sc} interaction is done through the server \gls{api} we 
 Similarly we defined the \texttt{write} modifier to check that certain \texttt{ArtworkData} fields are only modified by the owner or logger respectively. The \texttt{currentStatus} field cannot be modified at all, it is updated automatically once the actors approved a status change. The detailed permission sets of each actor can be found in Table \ref{tab:permission_sets} 
 
 \subsection{Functions}
-To support the functionality designed in Section \ref{sec:overview} the contract implements three main fucntions
+To support the functionality designed in Section \ref{sec:overview} the contract implements three main functions along with some helper functions to improve code readability.
 
 \subsubsection{safeMint}
+This function is called to create a new \gls{nft}. This process is called "minting". The safeMint function in an ERC721 contract creates and assigns ownership of a new \gls{nft} to a designated recipient. 
+
+\lstinputlisting[
+    language=Solidity,
+    caption=\gls{sc} safeMint function,
+    label=lst:scsafemint,
+    firstline=139,
+    lastline=148
+]{codesnippets/smartcontract.sol}
+
+Our implementation is rather straight forward, first we increment the counter variable which keeps track of the total supply. We also use this number as a token identifier which is equal to the artwork id. With this unique id we call the \texttt{\_safeMint(to, tokenId)} function of the ERC721 contract provided by openzeppelin. In Line 8 of Listing \ref{lst:scsafemint} we initialize a new ArtworkData instance with the initial data, which is partially provided by the user via a function parameter. We assign the values of the objectID property as well as the actors and the logger properties. The violation timestamp, id, and status properties are ignored and set to a default value. Finally the artworkData is associated with the newly minted artwork in the artworks mapping.
 
 \subsubsection{updateArtworkData}
 The data associated with an artwork can be updated by calling this function. The implementation of this function allows to update many fields at once. This has some advantages:
+
 \begin{itemize}[align=left, font=\itshape]
     \item[simplified interface:] Using only one update function instead of exposing an update function for each field reduces the number of public functions. This results in a more understandable and usable contract.
-    \item[atomic updates:] If an error occurs during the execution of this function the transaction as a whole is reverted, resulting in the initial state of the contract. This maintains data consitency and prevents partial updates.
+    \item[atomic updates:] If an error occurs during the execution of this function the transaction as a whole is reverted, resulting in the initial state of the contract. This maintains data consistency and prevents partial updates.
     \item[reduced costs:] The possibility to update multiple fields at once reduces the number of transactions that need to be submitted and in turn reduces execution costs.
 \end{itemize}
 
@@ -175,19 +187,25 @@ The data associated with an artwork can be updated by calling this function. The
 
 The \texttt{updateArtworkData} expects the updated data as parameter of the type ArtworkData. Solidity expects every field of the \texttt{data} parameter to be populated. This is why we check for each field if the value should be updated and in turn execute the according update. For string fields this check is done by checking the length of the incoming string. An empty string with length $0$ indicates that the user did not update this field. The same check is not possible with addresses. This is why we decided to use the address $0$x$00...001$ to mark an empty address update field. The zero address $(0$x$0)$ is reserved to remove an address from a field.
 
-The code executed if the update conditions evaluate to true differ in complexity. For the \texttt{violationTimestamp} field it is as simple as executing: 
+The code executed if the update conditions evaluate to true differ in complexity. For the \texttt{violationTimestamp} field it is as simple as assigning the new timestamp to the corresponding artwork: 
 \begin{lstlisting}[language=Solidity]
     artworks[data.id].violationTimestamp = data.violationTimestamp
 \end{lstlisting}
+This works identically for updating the roles and the objectID. When updating the logger address we implemented an additional check to prevent updates when the artwork is IN\_TRANSIT.
+\begin{lstlisting}[language=Solidity]
+    require(
+        !(artworks[data.id].status.currentStatus.equal("IN_TRANSIT")),
+        "logger cannot be updated in transit 403"
+    );
+\end{lstlisting}
 
 However the logic behind updating the status is more complex. The update status request is visualized in Figure \ref{fig:update_status}.
-
-\begin{figure}
+\begin{wrapfigure}{o}{0.6\textwidth}
     \centering
-    \includegraphics[width=\textwidth, keepaspectratio]{diagrams/update_status.drawio.pdf}
+    \includegraphics[width=0.59\textwidth, keepaspectratio]{diagrams/update_status.drawio.pdf}
     \caption{Multi-approval status update flow}
     \label{fig:update_status}
-\end{figure}
+\end{wrapfigure}
 
 \subsubsection{getArtworkData}
 

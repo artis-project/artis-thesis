@@ -61,10 +61,12 @@
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{verylightgray}{rgb}{.97,.97,.97}
+
 
 \lstdefinestyle{codestyle}{
-    backgroundcolor=\color{backcolour},   
-    commentstyle=\color{codegreen},
+    backgroundcolor=\color{verylightgray},%backcolour},   
+    commentstyle=\color{gray}\ttfamily,
     keywordstyle=\color{magenta},
     numberstyle=\tiny\color{codegray},
     stringstyle=\color{codepurple},
@@ -81,7 +83,6 @@
     tabsize=2,
     aboveskip=0.5cm
 }
-
 \lstset{style=codestyle}
 
 \input{solidity-highlighting}
