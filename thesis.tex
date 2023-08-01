@@ -11,6 +11,7 @@
 \usepackage{latexsym}
 \usepackage{amssymb}
 \usepackage{epsfig}
+\usepackage{pdfpages}
 \usepackage{enumitem}
 \usepackage{moreverb}
 \usepackage{rotating}
@@ -168,6 +169,13 @@
 \addcontentsline{toc}{chapter}{List of Tables}
 \lstlistoflistings
 \addcontentsline{toc}{chapter}{Listings}
+
+\includepdf[
+    pagecommand={
+        \markboth{}{}
+        \addcontentsline{toc}{chapter}{Declaration of Independence}
+    }
+]{chapters/declaration_of_independence.pdf}
 
 \input{chapters/appendix.tex}
 

@@ -94,7 +94,7 @@ When the \gls{sc} is first deployed the smartcontract admin is set to the deploy
 
 As seen in Listing \ref{lst:scconstructor} the \gls{sc} extends the ERC721 \cite{erc721} contract which provides the \gls{nft} interface.
 
-\subsection{Data Structures}
+\subsection{Data Structures and Events}
 To understand the rest of the contract we will explain the data structures used in more detail.
 
 \subsubsection{Structs}
@@ -134,6 +134,19 @@ The \texttt{artworks} mapping is used to map artwork ids to \texttt{ArtworkData}
 
 \textit{e.g.} \texttt{approvals[1][StatusValue.IN\_TRANSIT].carrier} is \texttt{true} if and only if the carrier has already approved to change the artwork status of artwork $1$ to IN\_TRANSIT.
 
+\subsubsection{Events}
+The contract defines three events (Listing \ref{lst:scevents}). The \texttt{Updated} event is emitted whenever the data associated with an artwork has changed. The \texttt{StatusApproved} event is emitted whenever the multi-approval process (Figure \ref{fig:update_status}) has been successful. If an approval is still missing the \texttt{ApprovalMissing} event is emitted. Users are able to subscribe to these events and be notified whenever an event is emitted.
+
+\lstinputlisting[
+    language=Solidity,
+    caption=\gls{sc} events,
+    label=lst:scevents,
+    firstline=171,
+    lastline=188
+]{codesnippets/smartcontract.sol}
+
+\subsection{Functions and Modifiers}
+To support the functionality designed in Section \ref{sec:overview} the contract implements three main functions along with some modifiers and helper functions. However, we will not go into detail about the helper functions.
 
 \subsubsection{Function Modifiers}
 In Solidity we can define function modifiers, that can be used to prepend functionality to a function. If a function modifier is used in a function the code in the modifier is executed beforehand. For instance this can be used to perform a check before a function is run. Function modifiers can be reused on multiple functions and thus introduce cleaner and less redundant code.
@@ -141,19 +154,20 @@ In Solidity we can define function modifiers, that can be used to prepend functi
 \lstinputlisting[
     language=Solidity,
     caption=\gls{sc} modifiers,
-    label=lst:scmodifiers1,
+    label=lst:scmodifiers,
     firstline=81,
     lastline=121
 ]{codesnippets/smartcontract.sol}
 
-The modifiers in Listing \ref{lst:scmodifiers1} are used to check if a caller is authorized to call a specific function. If the call is forbidden the transaction is reverted with an appropriate error message. The last three characters of each error message represent the corresponding \gls{http} status code. This status code is directly forwarded by the server \gls{api} in case of an error.
+The modifiers in Listing \ref{lst:scmodifiers} are used to check if a caller is authorized to call a specific function. If the call is forbidden the transaction is reverted with an appropriate error message. The last three characters of each error message represent the corresponding \gls{http} status code. This status code is directly forwarded by the server \gls{api} in case of an error.
 
-To ensure that all \gls{sc} interaction is done through the server \gls{api} we modified every public function with the \texttt{onlyAdmin} modifier. The \texttt{read} modifier is additionally added to each function that reads data from the \gls{sc}. There we check that the wallet that authenticated a request to the server \gls{api} is registered as an actor with read permissions.
+To ensure that all \gls{sc} interaction is done through the server \gls{api} we modified every public function with the \texttt{onlyAdmin} modifier. This modifier reverts any transaction which is sent from a different account then the specified admin account.
 
-Similarly we defined the \texttt{write} modifier to check that certain \texttt{ArtworkData} fields are only modified by the owner or logger respectively. The \texttt{currentStatus} field cannot be modified at all, it is updated automatically once the actors approved a status change. The detailed permission sets of each actor can be found in Table \ref{tab:permission_sets} 
+The \texttt{read} modifier is additionally added to each function that reads data from the \gls{sc}. There we check that the wallet that authenticated a request to the server \gls{api} is registered as an actor with read permissions.
 
-\subsection{Functions}
-To support the functionality designed in Section \ref{sec:overview} the contract implements three main functions along with some helper functions to improve code readability.
+Similarly we defined the \texttt{write} modifier to check that certain \texttt{ArtworkData} fields are only modified by the owner or logger respectively. The \texttt{currentStatus} field cannot be modified at all, it is updated automatically once the actors approved a status change. The detailed permission sets of each actor can be found in Table \ref{tab:permission_sets}
+
+The contract makes use of one additional modifier called \texttt{exists} which simply checks if a given tokenId actually exists.
 
 \subsubsection{safeMint}
 This function is called to create a new \gls{nft}. This process is called "minting". The safeMint function in an ERC721 contract creates and assigns ownership of a new \gls{nft} to a designated recipient. 
@@ -169,7 +183,7 @@ This function is called to create a new \gls{nft}. This process is called "minti
 Our implementation is rather straight forward, first we increment the counter variable which keeps track of the total supply. We also use this number as a token identifier which is equal to the artwork id. With this unique id we call the \texttt{\_safeMint(to, tokenId)} function of the ERC721 contract provided by openzeppelin. In Line 8 of Listing \ref{lst:scsafemint} we initialize a new ArtworkData instance with the initial data, which is partially provided by the user via a function parameter. We assign the values of the objectID property as well as the actors and the logger properties. The violation timestamp, id, and status properties are ignored and set to a default value. Finally the artworkData is associated with the newly minted artwork in the artworks mapping.
 
 \subsubsection{updateArtworkData}
-The data associated with an artwork can be updated by calling this function. The implementation of this function allows to update many fields at once. This has some advantages:
+The data associated with an artwork can be updated by calling this function. Upon successful update the function does not actually return anything but emits an event with the updated values. This is based on a limitation of Solidity where it is not possible to return an object from a state-changing function. Additionally this function allows to update multiple fields at once. This has some advantages:
 
 \begin{itemize}[align=left, font=\itshape]
     \item[simplified interface:] Using only one update function instead of exposing an update function for each field reduces the number of public functions. This results in a more understandable and usable contract.
@@ -187,7 +201,7 @@ The data associated with an artwork can be updated by calling this function. The
 
 The \texttt{updateArtworkData} expects the updated data as parameter of the type ArtworkData. Solidity expects every field of the \texttt{data} parameter to be populated. This is why we check for each field if the value should be updated and in turn execute the according update. For string fields this check is done by checking the length of the incoming string. An empty string with length $0$ indicates that the user did not update this field. The same check is not possible with addresses. This is why we decided to use the address $0$x$00...001$ to mark an empty address update field. The zero address $(0$x$0)$ is reserved to remove an address from a field.
 
-The code executed if the update conditions evaluate to true differ in complexity. For the \texttt{violationTimestamp} field it is as simple as assigning the new timestamp to the corresponding artwork: 
+The code to update artwork properties differs in complexity. For the \texttt{violationTimestamp} field it is as simple as assigning the new timestamp to the corresponding artwork: 
 \begin{lstlisting}[language=Solidity]
     artworks[data.id].violationTimestamp = data.violationTimestamp
 \end{lstlisting}
@@ -199,15 +213,34 @@ This works identically for updating the roles and the objectID. When updating th
     );
 \end{lstlisting}
 
-However the logic behind updating the status is more complex. The update status request is visualized in Figure \ref{fig:update_status}.
-\begin{wrapfigure}{o}{0.6\textwidth}
+\paragraph{Updating the transportation status}
+\label{sec:update_status}
+The logic behind updating the status (Figure \ref{fig:update_status}) is more complex. The reason for this is the multi-approval feature of this contract. To satisfy our use case it is necessary for the actors to agree on the transportation status of the artwork. To ensure this agreement, each of the affected actors have to submit an update request with the same value. Only if this requirement is satisfied the binding transportation status is updated. 
+
+\begin{figure}[ht]
     \centering
-    \includegraphics[width=0.59\textwidth, keepaspectratio]{diagrams/update_status.drawio.pdf}
-    \caption{Multi-approval status update flow}
+    \includegraphics[height=0.5\textheight, keepaspectratio]{diagrams/update_status.drawio.pdf}
+    \caption{Multi-approval transportation status change}
     \label{fig:update_status}
-\end{wrapfigure}
+\end{figure}
+
+To differentiate between the status that actors want to change to and the status which is currently in place we introduced two variables: \texttt{requestedStatus} and \texttt{currentStatus}. Users are able to request a status change by submitting a new \texttt{requestedStatus}. If this value does not match the previous value all approvals are reset and the \texttt{requestedStatus} field is set to the new value. The next step is to set the approval for the actor who sent the initial update request. Because different actors need to approve for different status changes we need to check for the three distinct cases.
+
+If the status is requested to change from TO\_BE\_DELIVERED to IN\_TRANSIT the carrier and the owner must approve that change. This check is preformed analogously for the change from IN\_TRANSIT to DELIVERED. Lastly the decision to change from DELIVERED to TO\_BE\_DELIVERED is made by the owner alone. Any other combination of status change is not allowed and the transaction will be reverted.
+
+If the right approvals have already been made the function will update the \texttt{currentStatus} automatically and terminate. If any approval is missing it will terminate without updating the \texttt{currentStatus}. In that case the actor in question must submit their own request for a status update.
 
 \subsubsection{getArtworkData}
+The function to retrieve data about an artwork is the simplest one. It merely returns the \texttt{ArtworkData} object mapped to the requested artwork id. To easily convert the returned tuple to an object using the contract \gls{abi}, each property is mapped to the tuple entry specified in the function signature, visible in Listing \ref{lst:scget}.
+
+\lstinputlisting[
+    language=Solidity,
+    caption=\gls{sc} getArtworkData function signature,
+    label=lst:scget,
+    firstline=150,
+    lastline=169
+]{codesnippets/smartcontract.sol}
+
 
 \section{artis-server}
 

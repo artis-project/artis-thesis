@@ -146,3 +146,43 @@ function safeMint(address to, ArtworkData memory data)
   ArtworkData memory newArtwork = ArtworkData({ ... });
   artworks[tokenId] = newArtwork;
 }
+
+function getArtworkData(uint256 tokenId, address sender)
+  public
+  view
+  onlyAdmin
+  exists(tokenId)
+  read(sender, tokenId)
+  returns (
+    uint256 id,
+    string memory objectId,
+    address owner,
+    address carrier,
+    address logger,
+    address recipient,
+    string memory currentStatus,
+    string memory requestedStatus,
+    bool carrierApproval,
+    bool ownerApproval,
+    bool recipientApproval,
+    uint256 violationTimestamp
+  ) { ... }
+
+event Updated(
+  uint256 indexed tokenId,
+  ArtworkData newData,
+  address owner,
+  StatusApprovals approvals
+);
+
+event StatusApproved(
+  uint256 indexed tokenId,
+  StatusApprovals approvals,
+  address approver
+);
+
+event ApprovalMissing(
+  uint256 indexed tokenId,
+  string requestedStatus,
+  address missingApproval
+);
