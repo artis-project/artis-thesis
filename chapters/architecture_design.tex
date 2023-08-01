@@ -55,11 +55,8 @@ As already introduced in the section \nameref{sec:scenario_definition}, the syst
 \subsection{Technical Components}
 Apart from the specified external actors of the system, there are also technical components to consider. The main components of the system are visually separated by colored areas in Figure \ref{fig:architecture}.
 
-\subsubsection{IoT Device}
-The logging device is responsible for recording temperature and humidity data while the artwork is in transit. It will evaluate the data against a predefined threshold and report any violation to the system. It will interact with the system via the \gls{api} provided by the backend server. It will not interact with the \gls{sc} directly. However, the logger is also represented by an Ethereum account and equipped with a key pair. This will be used for authentication by signing a message.
-
 \subsubsection{Blockchain}
-The blockchain component of the system consists of two sub-components. To interact with the blockchain a \gls{rpc} endpoint is needed. This endpoint can be used by the backend server to submit transactions that are used to interact with the \gls{sc}.
+The blockchain component of the system consists of two sub-components. To interact with the blockchain a \gls{rpc} endpoint is needed. This endpoint can be used by the backend server to submit transactions that are used to interact with the \gls{sc}. For this project, we will consume a managed service to access the Ethereum network and not run our own Ethereum node.
 
 The second component is the \gls{sc} itself. It will be in charge of defining the \gls{nft} of the artwork. 
 The functionality provided by the \gls{sc} is defined as follows:
@@ -103,6 +100,9 @@ The authentication flow visualized in Figure \ref{fig:auth_flow} is using signat
 
 \paragraph{Features}
 In addition to enabling the features of the \gls{sc}, and managing authentication, the server will also validate incoming requests and provide meaningful error messages to the user.
+
+\subsubsection{IoT Device}
+The logging device is responsible for recording temperature and humidity data while the artwork is in transit. It will evaluate the data against a predefined threshold and report any violation to the system. It will interact with the system via the \gls{api} provided by the backend server. It will not interact with the \gls{sc} directly. However, the logger is also represented by an Ethereum account and equipped with a key pair. This will be used for authentication by signing a message.
 
 \subsubsection{Frontend}
 To simplify the interaction with the system we included a user interface in the system. The frontend presentation layer is a web application that is specially designed to simplify the authentication flow by integrating popular blockchain wallets to sign messages and allow the login with wallet functionality. Therefore it should afford to easily guide the user through the authentication flow and provide a graphical interface to the backend server \gls{api}.
