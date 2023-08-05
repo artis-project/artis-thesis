@@ -165,12 +165,114 @@ The function to retrieve data about an artwork is the simplest one. It merely re
 
 \clearpage
 \section{artis-server}
-The server is the central part of the system, it connects the end users to the \gls{sc}. The responsibilities of the server can be separated into three layers. They each 
+The server is the central part of the system, it connects the end users to the \gls{sc}. The responsibilities of the server can be separated into three layers. The files of the server's directory structure depicted in Figure \ref{fig:server_directory_structure} and the corresponding code will be explained in the next sections. The server code is implemented in Python using a variety of libraries that will be addressed later on.
+
+\begin{figure}
+    \centering
+    \input{diagrams/server_directory_structure.tex}    
+    \caption{Server directory structure}
+    \label{fig:server_directory_structure}
+\end{figure}
 
 \subsection{Authentication Layer}
-\subsection{API Layer}
-\subsection{Application Layer}
+\label{sec:authentication_layer}
+To implement the authentication flow described in section \ref{sec:authentication} we defined an \texttt{Authenticator} class, which handles the server-side logic. This class implements functions provided by the thirdweb library \cite{thirdweb} but has been adapted to fit our specific use case. The functionality described in this section is exposed by the \gls{api} via the endpoints listed in Table \ref{tab:authentication_endpoints}
 
+\lstinputlisting[
+    language=Python,
+    caption=Generating the challenge payload,
+    label=lst:authpayload,
+    firstline=1,
+    lastline=15
+]{codesnippets/authenticator.py}
+
+The method described in Listing \ref{lst:authpayload} constructs a dictionary with the information that is used to build the challenge message. The method is exposed by the \gls{api} layer via the \texttt{/auth/payload} endpoint as listed in Table \ref{tab:authentication_endpoints}. This dictionary is then returned to the client who constructs a message from the dictionary and signs it.
+
+\lstinputlisting[
+    language=Python,
+    caption=Verifying the signature,
+    label=lst:authlogin,
+    firstline=17,
+    lastline=32
+]{codesnippets/authenticator.py}
+
+The signed message is then sent back and verified by the \texttt{verify} method listed in Listing \ref{lst:authlogin}. After reconstructing the challenge message, the method recovers the account address that was used for the signature. If it matches the address specified in Line 7 of Listing \ref{lst:authpayload} the authentication request is valid. This proves that the user who sent the request actually is in possession of the specified account. To recover the address the python web3 library was used \cite{web3python}.
+
+If the authentication request succeeded the client will issue a \gls{jwt} which is signed by the server wallet. This token is then used to authenticate further requests until it expires. The \gls{jwt}'s signature as well as the expiration date are verified upon each request by the \texttt{Authenticator} class. The \texttt{Authenticator} exposes this functionality with the \texttt{/auth/login} endpoint.
+
+There are two additional authentication endpoints exposed by the \gls{api}. \texttt{/auth/logout} closes the session and \texttt{/auth/user} returns information about the subject of a \gls{jwt}. It can be queried to check if the session is still active and react accordingly on the client side.
+
+\subsection{API Layer}
+To expose the functionality defined in the use case and implemented in the \gls{sc}, it is enough to implement four different \gls{api} endpoints. The authentication mechanism described in Section \ref{sec:authentication_layer} provides another set of four endpoints.
+
+\begin{table}[h]
+    \begin{subtable}{0.45\textwidth}
+        \centering
+        \begin{tabular}{ll}
+            \textbf{Endpoint}                       & \textbf{Method} \\ \hline
+            \texttt{/artworks}                   & POST                 \\
+            \texttt{/artworks}                   & GET                  \\
+            \texttt{/artworks/<int:artwork\_id>} & GET                  \\
+            \texttt{/artworks/<int:artwork\_id>} & PATCH
+        \end{tabular}
+        \caption{Resource endpoints}
+        \label{tab:resource_endpoints}
+    \end{subtable}
+    \hfill
+    \begin{subtable}{0.45\textwidth}
+        \centering
+        \begin{tabular}{ll}
+            \textbf{Endpoint}                       & \textbf{Method} \\ \hline
+            \texttt{/auth/payload}               & POST                \\
+            \texttt{/auth/login}                 & POST                 \\
+            \texttt{/auth/logout}                & POST                  \\
+            \texttt{/auth/user}                  & GET 
+        \end{tabular}
+        \caption{Authentication endpoints}
+        \label{tab:authentication_endpoints}
+    \end{subtable}
+\caption{\gls{api} endpoints}
+\end{table}
+
+The \gls{json} schema of the artwork resource is shown in Listing \ref{lst:artwork}. Such a \gls{json} object is returned by both of the \texttt{/artworks/<int:artwork\_id>} endpoints. The properties marked with an arrow ($\rightarrow$) can be included in the body of a PATCH request to \texttt{/artworks/<int:artwork\_id>}. The POST request to \texttt{/artworks} expects the same body except for the \texttt{requestedStatus} property which cannot be set and the \texttt{owner} property which can be set to mint an artwork \gls{nft} for someone else. The request body is validated using the models defined in the \texttt{src/models/} folder. This is done by leveraging the functionality to define custom schemas and fields of the Marshmallow \cite{marshmallow} package.
+
+\lstinputlisting[
+    language=JSON,
+    caption=Artwork \gls{json} schema,
+    label=lst:artwork,
+    lastline=17,
+    mathescape=true
+]{codesnippets/artwork.json}
+
+A GET request to \texttt{/artworks} will return the artwork ids where the requester is registered as an actor. This response is shown in Listing \ref{lst:getall}. A POST request to the same endpoint will return \lstinline[language=JSON]!{ "tokenId": integer }!.
+
+\lstinputlisting[
+    language=JSON,
+    caption=GET \texttt{/artworks} response,
+    label=lst:getall,
+    firstline=19,
+    lastline=24
+]{codesnippets/artwork.json}
+
+To build the \gls{api} application we used Flask \cite{flask}. The entry point of the Flask application is the \texttt{app.py} file in the base folder. The endpoint definitions of the \texttt{/artworks} route are shown in Listing \ref{lst:flaskapp}. The logic in the entry methods is reduced to a minimum. The body is validated and loaded to the internal \texttt{Artwork} class. Then the request is processed by the application layer and returned after being converted back to a \gls{json} object.
+
+\lstinputlisting[
+    language=Python,
+    caption=Definition of Endpoints,
+    label=lst:flaskapp
+]{codesnippets/app.py}
+
+
+\subsection{Application Layer}
+The application layer is responsible for connecting to the \gls{sc} and submitting the transactions needed to fulfill the \gls{api} request. To do this we are using the python web3 library \cite{web3python}. This functionality is defined in the \texttt{/src/smartcontract/ArtworkConnector.py} file. It defines a class which extends the \texttt{SmartContractConnector} abstract class. The \texttt{SmartContractConnector} class contains code that is generally necessary to connect to a \gls{sc}. This includes setting up the Web3 provider, as well as the account to submit the transactions, and adding some middleware. Additionally we decided to define two abstractmethods that fetch the contract address and contract \gls{abi} dynamically. This ensures that the \gls{api} is always connected to the newest contract. In our case we used github variables to store the contract address and the Etherscan \cite{etherscan} \gls{api} to query the \gls{abi}. With this setup we built an extensible platform that can add endpoints to connect to additional \glspl{sc} more easily. 
+
+The \texttt{ArtworkConnector} class basically has the same interface as the solidity contract. Each public method directly connects to a \gls{sc} method.
+
+\lstinputlisting[
+    language=Python,
+    caption=ArtworkConnector class,
+    label=lst:artworkconnector
+]{codesnippets/ArtworkConnector.py}
 
 \clearpage
 \section{artis-rockpi-logger}
@@ -191,7 +293,7 @@ The function will attempt to read multiple times (up to the specified retries) u
 \begin{figure}[h]
     \centering
     \input{diagrams/logger_filetree.tex}    
-    \caption{Logger filetree}
+    \caption{Logger directory structure}
     \label{fig:artis-logger-filetree}
 \end{figure}
 

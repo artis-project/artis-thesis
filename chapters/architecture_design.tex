@@ -33,10 +33,10 @@ The real-world scenario of transferring custody of artwork for transportation is
 Since the system is considering a very specific scenario This chapter aims to provide a high-level overview of the architecture of the system while later going into detail about its components and actors. From now on we will call the artwork tracking system \texttt{ARTIS}.
 
 \begin{figure}[ht]
-    \label{fig:architecture}
     \centering
     \includegraphics[width=\textwidth, keepaspectratio]{diagrams/architecture.drawio.pdf}
     \caption{System Architecture}
+    \label{fig:architecture}
 \end{figure}
 
 This architecture was designed using a top-down design approach, with the initial step of building a server application that is able to interact with the \gls{sc}. In the implementation phase, we then added the specific functionality that is needed to support the defined scenario. In Figure \ref{fig:architecture} you can see the final architecture of the system. 
@@ -88,6 +88,7 @@ Update data fields         & ✗                     & ✓                    & 
 The backend server is designed to provide an abstracted form of interaction to the \gls{sc} by exposing a \gls{rest} \gls{api}. Like the actors and the logger, the backend server is also represented by an Ethereum account. This account is used to deploy the \gls{sc} and acts as the sole point of access to it. Every transaction is issued by this account. The backend server is also responsible for handling authentication which is designed to prove that incoming requests are made by the actors who are owners of the Ethereum accounts associated with certain roles.
 
 \paragraph{Authentication}
+\label{sec:authentication}
 
 \begin{wrapfigure}{o}{0.6\textwidth}
     \centering

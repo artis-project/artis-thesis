@@ -1,0 +1,24 @@
+{
+  "id": integer,
+  "objectId": string, $\leftarrow$
+  "owner": string,
+  "recipient": string | null, $\leftarrow$
+  "carrier": string | null, $\leftarrow$
+  "violationTimestamp": integer, $\leftarrow$
+  "status": { 
+ $\rightarrow$ "requestedStatus": IN_TRANSIT | DELIVERED | TO_BE_DELIVERED | NONE,
+    "currentStatus": IN_TRANSIT | DELIVERED | TO_BE_DELIVERED,
+    "approvals" {
+      "owner": boolean,
+      "recipient": boolean,
+      "carrier": boolean
+    }
+  }
+}
+
+{
+  "owner": [integer],
+  "recipient": [integer],
+  "carrier": [integer],
+  "logger": [integer],
+}

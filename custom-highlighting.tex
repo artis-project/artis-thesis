@@ -3,7 +3,34 @@
 
 \usepackage{listings, xcolor}
 
+% Define style for code listings
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 \definecolor{verylightgray}{rgb}{.97,.97,.97}
+
+
+\lstdefinestyle{codestyle}{
+    backgroundcolor=\color{verylightgray},%backcolour},   
+    commentstyle=\color{gray}\ttfamily,
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,             
+    tabsize=2,
+    aboveskip=0.5cm
+}
+\lstset{style=codestyle}
 
 \lstdefinelanguage{Solidity}{
 	keywords=[1]{anonymous, assembly, assert, balance, break, call, callcode, case, catch, class, constant, continue, constructor, contract, debugger, default, delegatecall, delete, do, else, emit, event, experimental, export, external, false, finally, for, function, gas, if, implements, import, in, indexed, instanceof, interface, internal, is, length, library, log0, log1, log2, log3, log4, memory, modifier, new, payable, pragma, private, protected, public, pure, push, require, return, returns, revert, selfdestruct, send, solidity, storage, struct, suicide, super, switch, then, this, throw, transfer, true, try, typeof, using, value, view, while, with, addmod, ecrecover, keccak256, mulmod, ripemd160, sha256, sha3}, % generic keywords including crypto operations
@@ -20,4 +47,12 @@
 	stringstyle=\color{red}\ttfamily,
 	morestring=[b]',
 	morestring=[b]"
+}
+
+\lstdefinelanguage{JSON}{
+    keywords={null, false, true, IN_TRANSIT, DELIVERED, TO_BE_DELIVERED, NONE, string, integer, boolean},
+    keywordstyle={\color{teal}\bfseries},
+    comment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    commentstyle=\color{gray}\ttfamily
 }

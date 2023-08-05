@@ -10,6 +10,8 @@
 \usepackage{amsmath}
 \usepackage{latexsym}
 \usepackage{amssymb}
+\usepackage{caption}
+\usepackage{subcaption}
 \usepackage{epsfig}
 \usepackage{pdfpages}
 \usepackage{enumitem}
@@ -27,6 +29,7 @@
 \usepackage{textcomp}
 \usepackage{float}
 \usepackage{url}
+\usepackage{tabularray}
 \usepackage{unizhdt}
 \usepackage[abbreviations, nonumberlist, shortcuts, automake, nogroupskip]{glossaries-extra}
 \usepackage{forest}
@@ -57,36 +60,8 @@
     \printfield{booktitle}% used to display last-accessed for websites due to a limitation of mendeley api
     \finentry
 }
-% Define style for code listings
-\definecolor{codegreen}{rgb}{0,0.6,0}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
-\definecolor{verylightgray}{rgb}{.97,.97,.97}
 
-
-\lstdefinestyle{codestyle}{
-    backgroundcolor=\color{verylightgray},%backcolour},   
-    commentstyle=\color{gray}\ttfamily,
-    keywordstyle=\color{magenta},
-    numberstyle=\tiny\color{codegray},
-    stringstyle=\color{codepurple},
-    basicstyle=\ttfamily\footnotesize,
-    breakatwhitespace=false,         
-    breaklines=true,                 
-    captionpos=b,                    
-    keepspaces=true,                 
-    numbers=left,                    
-    numbersep=5pt,                  
-    showspaces=false,                
-    showstringspaces=false,
-    showtabs=false,             
-    tabsize=2,
-    aboveskip=0.5cm
-}
-\lstset{style=codestyle}
-
-\input{solidity-highlighting}
+\input{custom-highlighting}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
