@@ -102,7 +102,7 @@ This function is called to create a new \gls{nft}. This process is called "minti
     lastline=148
 ]{codesnippets/smartcontract.sol}
 
-Our implementation is rather straightforward, first we increment the counter variable which keeps track of the total supply. We also use this number as a token identifier which is equal to the artwork id. With this unique id, we call the \texttt{\_safeMint(to, tokenId)} function of the ERC721 contract provided by openzeppelin. In Line 8 of Listing \ref{lst:scsafemint} we initialize a new ArtworkData instance with the initial data, which is partially provided by the user via a function parameter. We assign the values of the objectID property as well as the actors and the logger properties. The violation timestamp, id, and status properties are ignored and set to a default value. Finally, the artwork data is associated with the newly minted artwork in the \texttt{artworks} mapping.
+Our implementation is rather straightforward, first, we increment the counter variable which keeps track of the total supply. We also use this number as a token identifier which is equal to the artwork \gls{id}. With this unique \gls{id}, we call the \texttt{\_safeMint(to, tokenId)} function of the ERC721 contract provided by openzeppelin \cite{openzeppelin}. In Line 8 of Listing \ref{lst:scsafemint} we initialize a new ArtworkData instance with the initial data, which is partially provided by the user via a function parameter. We assign the values of the objectID property as well as the actors and the logger properties. The violation timestamp, \gls{id}, and status properties are ignored and set to a default value. Finally, the artwork data is associated with the newly minted artwork in the \texttt{artworks} mapping.
 
 \subsubsection{updateArtworkData}
 The data associated with an artwork can be updated by calling this function. Upon successful update, the function does not actually return anything but emits an event with the updated values. This is based on a limitation of Solidity where it is not possible to return an object from a state-changing function. Additionally, this function allows you to update multiple fields at once. This has some advantages:
@@ -153,7 +153,7 @@ If the status is requested to change from TO\_BE\_DELIVERED to IN\_TRANSIT the c
 If the right approvals have already been made the function will update the \texttt{currentStatus} automatically and terminate. If any approval is missing it will terminate without updating the \texttt{currentStatus}. In that case, the actor in question must submit their own request for a status update.
 
 \subsubsection{getArtworkData}
-The function to retrieve data about an artwork is the simplest one. It merely returns the \texttt{ArtworkData} object mapped to the requested artwork id. To easily convert the returned tuple to an object using the contract \gls{abi}, each property is mapped to the tuple entry specified in the function signature, visible in Listing \ref{lst:scget}.
+The function to retrieve data about an artwork is the simplest one. It merely returns the \texttt{ArtworkData} object mapped to the requested artwork \gls{id}. To easily convert the returned tuple to an object using the contract \gls{abi}, each property is mapped to the tuple entry specified in the function signature, visible in Listing \ref{lst:scget}.
 
 \lstinputlisting[
     language=Solidity,
@@ -209,10 +209,10 @@ To expose the functionality defined in the use case and implemented in the \gls{
     \begin{subtable}{0.45\textwidth}
         \centering
         \begin{tabular}{ll}
-            \textbf{Endpoint}                       & \textbf{Method} \\ \hline
-            \texttt{/artworks}                   & POST                 \\
-            \texttt{/artworks}                   & GET                  \\
-            \texttt{/artworks/<int:artwork\_id>} & GET                  \\
+            \textbf{Endpoint}                    & \textbf{Method} \\ \hline
+            \texttt{/artworks}                   & POST             \\
+            \texttt{/artworks}                   & GET               \\
+            \texttt{/artworks/<int:artwork\_id>} & GET                \\
             \texttt{/artworks/<int:artwork\_id>} & PATCH
         \end{tabular}
         \caption{Resource endpoints}
@@ -244,7 +244,7 @@ The \gls{json} schema of the artwork resource is shown in Listing \ref{lst:artwo
     mathescape=true
 ]{codesnippets/artwork.json}
 
-A GET request to \texttt{/artworks} will return the artwork ids where the requester is registered as an actor. This response is shown in Listing \ref{lst:getall}. A POST request to the same endpoint will return \lstinline[language=JSON]!{ "tokenId": integer }!.
+A GET request to \texttt{/artworks} will return the artwork IDs where the requester is registered as an actor. This response is shown in Listing \ref{lst:getall}. A POST request to the same endpoint will return \lstinline[language=JSON]!{ "tokenId": integer }!.
 
 \lstinputlisting[
     language=JSON,
@@ -266,11 +266,12 @@ To build the \gls{api} application we used Flask \cite{flask}. The entry point o
 \subsection{Application Layer}
 The application layer is responsible for connecting to the \gls{sc} and submitting the transactions needed to fulfill the \gls{api} request. To do this we are using the python web3 library \cite{web3python}. This functionality is defined in the \texttt{/src/smartcontract/ArtworkConnector.py} file. It defines a class which extends the \texttt{SmartContractConnector} abstract class. The \texttt{SmartContractConnector} class contains code that is generally necessary to connect to a \gls{sc}. This includes setting up the Web3 provider, as well as the account to submit the transactions, and adding some middleware. Additionally we decided to define two abstractmethods that fetch the contract address and contract \gls{abi} dynamically. This ensures that the \gls{api} is always connected to the newest contract. In our case we used github variables to store the contract address and the Etherscan \cite{etherscan} \gls{api} to query the \gls{abi}. With this setup we built an extensible platform that can add endpoints to connect to additional \glspl{sc} more easily. 
 
-The \texttt{ArtworkConnector} class basically has the same interface as the solidity contract. Each public method directly connects to a \gls{sc} method.
+The \texttt{ArtworkConnector} class basically has the same interface as the solidity contract. As shown in Listing \ref{lst:artworkconnector} each public method directly connects to a \gls{sc} method. Web3.py provides a simple to use smart contract proxy object which we stored in the class variable \texttt{self.\_contract}. This object makes all the contract functions available with the \texttt{functions} property. To call a contract function it suffices to execute \lstinline[language=Python]!self._contract.functions.<function_name>(<input>).call()!.
+This will return the value from the \gls{sc} and can more or less be directly returned to the user. If the function mutates the state of the contract we need to use \lstinline[language=Python]!.transact()! and a transaction hash is returned instead. We use this transaction hash to wait for the transaction receipt and extract the data from the emitted events. This is done by the helper function \texttt{self.\_handleEvent}.
 
 \lstinputlisting[
     language=Python,
-    caption=ArtworkConnector class,
+    caption=ArtworkConnector class methods,
     label=lst:artworkconnector
 ]{codesnippets/ArtworkConnector.py}
 
@@ -282,15 +283,15 @@ The \texttt{ArtworkConnector} class basically has the same interface as the soli
     \caption{Rock Pi with a DHT-22 sensor} 
     \label{fig:rock-pi}
 \end{wrapfigure}
-For this project, we used a Rock Pi \footnote{\href{https://rockpi.org/rockpi4}{https://rockpi.org/rockpi4}} with a DHT-22\footnote{\href{https://www.adafruit.com/product/385}{https://www.adafruit.com/product/385}} sensor attached. (Figure \ref{fig:rock-pi})
+Another major component of the system is the logging device used to monitor the environmental data during the transportation of the artwork. For this project, we used a Rock Pi \footnote{\href{https://rockpi.org/rockpi4}{https://rockpi.org/rockpi4}} with a DHT-22\footnote{\href{https://www.adafruit.com/product/385}{https://www.adafruit.com/product/385}} sensor attached. (Figure \ref{fig:rock-pi})
 
-The decision for this device and sensor is based on simplicity and flexibility as well as on low acquisition costs. The Rock Pi is compatible with Linux operating systems which makes it very simple to write scripts using high-level programming languages like Python. It also has \gls{gpio} support to easily connect the DHT-22 sensor. The sensor is capable of recording temperature and humidity data from the environment.
+The decision for this device and sensor is based on simplicity and flexibility as well as on low acquisition costs. The Rock Pi is compatible with the Linux operating systems which makes it very simple to write scripts using high-level programming languages like Python. It also has \gls{gpio} support to easily connect the DHT-22 sensor. The sensor is capable of recording temperature and humidity data from the environment.
 
 To read data from the DHT-22 sensor we used an existing library called Rockfruit\_Python\_DHT\footnote{\href{https://github.com/Tim-J-Parbs/Rockfruit_Python_DHT}{https://github.com/Tim-J-Parbs/Rockfruit\_Python\_DHT}} that we adapted slightly to work with our board. The library provides a function with the signature \texttt{read\_retry(sensor, pin, retries=15, delay\_seconds=2)}. This method reads data from the DHT sensor of the specified type (in our case 22) on the specified \gls{gpio} pin and returns a tuple of humidity (as a floating point value in percent) and temperature (as a floating point value in Celsius). 
 
 The function will attempt to read multiple times (up to the specified retries) until a reading can be registered. If no reading can be registered after the amount of retries the function will return \texttt{(None, None)}. The default delay between retries is two seconds but can be overridden.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \input{diagrams/logger_filetree.tex}    
     \caption{Logger directory structure}
@@ -306,7 +307,7 @@ The function will attempt to read multiple times (up to the specified retries) u
 
 In Listing \ref{lst:loggingscript} you can see that the script is executing the \texttt{read\_retry} function in an endless loop and whenever the reading has been successful it stores the data along with a timestamp of the reading in seconds and in a readable format in a local database.
 
-The logger contains a second important script which is run simultaneously. The \texttt{violation\_script.py} is executed with the predefined temperature and humidity thresholds and the corresponding artwork id.
+The logger contains a second important script which is run simultaneously. The \texttt{violation\_script.py} is executed with the predefined temperature and humidity thresholds and the corresponding artwork \gls{id}.
 
 \lstinputlisting[
     language=bash,
@@ -322,3 +323,62 @@ To authenticate to the \gls{api}, the logger follows the same authentication flo
 
 \clearpage
 \section{artis-frontend}
+The last component of the system is the user interface. It is built using React \cite{react}. The styling is done with Tailwind CSS \cite{tailwindcss}. The main benefit of the user interface is to enable a seamless login and authentication flow. This is done using Metamask \cite{metamask} as a wallet provider and the thirdweb library to interface with it. 
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}{0.65\textwidth}
+        \includegraphics[width=\textwidth]{resources/frontend_screenshots/welcome_screen.png}
+        \caption{Welcome Screen}
+        \label{fig:welcome_screen}
+        \vspace*{2mm}
+    \end{subfigure}
+\end{figure}
+
+An unauthenticated user is first landing on this welcome page with a button to connect the website to Metamask as shown in Figure \ref{fig:welcome_screen}. After pressing the button Metamask opens a pop-up to select the account to connect to the website (Figure \ref{fig:connecting_metamask}). Finally the button label changes to "Sign in" and as soon as the user presses the button again, a signature request is sent to the server. The message that is visible on the pop-up in Figure \ref{fig:sign_in} is a message constructed from the response of the POST \texttt{/auth/payload} request.
+
+\begin{figure}[h!]
+    \ContinuedFloat
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{resources/frontend_screenshots/connecting_wallet.png}
+        \caption{Connecting to Metamask}
+        \label{fig:connecting_metamask}
+    \end{subfigure}
+\end{figure}
+
+Once the user signs this message the signature is sent back to the server, validated and an authentication token is issued. The user is now logged in and is able to see all the artworks by their \glspl{id} that are associated with the logged-in account (Figure \ref{fig:artworks_page}).
+
+\begin{figure}
+    \ContinuedFloat
+    \centering
+    \begin{subfigure}{\textwidth}
+        \includegraphics[width=\textwidth]{resources/frontend_screenshots/sign_in.png}
+        \caption{Sign in request}
+        \label{fig:sign_in}
+        \vspace*{8mm}
+    \end{subfigure}
+    \begin{subfigure}{\textwidth}
+        \includegraphics[width=\textwidth]{resources/frontend_screenshots/artworks_page.png}
+        \caption{Artworks page}
+        \label{fig:artworks_page}
+    \end{subfigure}
+    \caption{Sign in process}
+    \label{fig:sign_in_process}
+\end{figure}
+
+The artwork page shows a colorful tile representing an artwork. Each tile is labeled with the corresponding artwork \gls{id}. The tabs on the top can be selected to view all the artworks where the account is registered \textit{e.g.} the user might be the owner of artwork $1$ but the recipient of artwork $2$. To create a new artwork \gls{nft}, the user can click on the transparent tile at the bottom. This will open up a modal where the user can enter details about the artwork (Figure \ref{fig:mint_modal}. To view more details about an existing artwork the user can click on a tile to open up the detail view shown in Figure \ref{fig:artwork_detail}.
+
+\begin{figure}
+    \centering
+    \begin{minipage}{0.45\textwidth}   
+        \includegraphics[width=0.9\textwidth]{resources/frontend_screenshots/mint_modal.png}
+        \caption{Artwork mint Modal}
+        \label{fig:mint_modal}
+    \end{minipage}\hfill
+    \begin{minipage}{0.45\textwidth}
+        \includegraphics[width=0.9\textwidth]{resources/frontend_screenshots/artwork_details.png}
+        \caption{Artwork detail view}
+        \label{fig:artwork_detail}
+    \end{minipage}
+\end{figure}
