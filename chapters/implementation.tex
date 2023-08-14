@@ -1,8 +1,9 @@
 \chapter{Implementation}
-This chapter highlights the implementational aspects of the system. Introducing the technologies used to build the components. Each section title is referring to its respective GitHub repository of the \texttt{ARTIS-project}\footnote{\href{https://github.com/artis-project/}{https://github.com/artis-project/}} GitHub organization.
+\label{chap:implementation}
+This chapter highlights the implementational aspects of the system. Introducing the technologies used to build the components. Each section title refers to its respective GitHub repository of the \texttt{ARTIS-project}\footnote{\href{https://github.com/artis-project/}{https://github.com/artis-project/}} GitHub organization.
 
 \section{artis-smartcontract}
-The \gls{sc} was written in Ethereum's native programming language Solidity \cite{solidity}. The contract was developed using hardhat \cite{hardhat}, a development environment for Ethereum. Hardhat makes it easy to develop, compile, test, and deploy smart contracts. The \gls{sc} has been deployed to the Ethereum testnet Sepolia \cite{sepolia} during development, but is intended to be deployed on the mainnet in production. The Ethereum blockchain was selected due to the prior experience of the research group and the author.
+The \gls{sc} was written in Ethereum's native programming language Solidity \cite{solidity}. The contract was developed using hardhat \cite{hardhat}, a development environment for Ethereum. Hardhat makes developing, compiling, testing, and deploying smart contracts easy. The \gls{sc} has been deployed to the Ethereum testnet Sepolia \cite{sepolia} during development, but is intended to be deployed on the mainnet in production. The Ethereum blockchain was selected due to the prior experience of the research group and the author.
 
 When the \gls{sc} is first deployed the \texttt{smartcontractAdmin} variable is set to the deploying address. This address will be the only point of access to any \gls{sc} function. It is also the account used by the server to interact with the \gls{sc} and sign transactions.
 
@@ -17,10 +18,10 @@ When the \gls{sc} is first deployed the \texttt{smartcontractAdmin} variable is 
 As seen in Listing \ref{lst:scconstructor} the \gls{sc} extends the ERC721 \cite{erc721} contract which provides the \gls{nft} interface.
 
 \subsection{Data Structures and Events}
-To understand the rest of the contract we will explain the data structures used in more detail.
+To understand the rest of the contract, we will explain the data structures used in more detail.
 
 \subsubsection{Structs}
-To satisfy the artwork tracking use case three additional structs have been defined as seen in Listing \ref{lst:scstructs}. The \texttt{ArtworkData} struct contains all information about a specific artwork. This includes the addresses of each actor as well as the violation timestamp and the status of the artwork. The status field in turn contains two fields as defined in the \texttt{Status} struct. They are used to support the multi-approval process when it comes to changing the status of an artwork. To match the physical artwork with the \gls{nft} we also included an objectID field. The \texttt{ArtworkData} struct can be extended with more data fields if needed.
+To satisfy the artwork tracking use case three additional structs have been defined as seen in Listing \ref{lst:scstructs}. The \texttt{ArtworkData} struct contains all information about a specific artwork. This includes the addresses of each actor as well as the violation timestamp and the status of the artwork. The status field in turn contains two fields as defined in the \texttt{Status} struct. They are used to support the multi-approval process when it comes to changing the status of an artwork. To match the physical artwork with the \gls{nft} we also included an objectID field. If needed, the \texttt{ArtworkData} struct can be extended with more data fields.
 
 The \texttt{StatusApprovals} struct is used to store which of the actors has already approved a status change. The logic behind this multi-approval process will be explained in detail later.
 
@@ -102,10 +103,10 @@ This function is called to create a new \gls{nft}. This process is called "minti
     lastline=148
 ]{codesnippets/smartcontract.sol}
 
-Our implementation is rather straightforward, first, we increment the counter variable which keeps track of the total supply. We also use this number as a token identifier which is equal to the artwork \gls{id}. With this unique \gls{id}, we call the \texttt{\_safeMint(to, tokenId)} function of the ERC721 contract provided by openzeppelin \cite{openzeppelin}. In Line 8 of Listing \ref{lst:scsafemint} we initialize a new ArtworkData instance with the initial data, which is partially provided by the user via a function parameter. We assign the values of the objectID property as well as the actors and the logger properties. The violation timestamp, \gls{id}, and status properties are ignored and set to a default value. Finally, the artwork data is associated with the newly minted artwork in the \texttt{artworks} mapping.
+Our implementation is rather straightforward, first, we increment the counter variable, which keeps track of the total supply. We also use this number as a token identifier which is equal to the artwork \gls{id}. With this unique \gls{id}, we call the \texttt{\_safeMint(to, tokenId)} function of the ERC721 contract provided by openzeppelin \cite{openzeppelin}. In Line 8 of Listing \ref{lst:scsafemint}, we initialize a new ArtworkData instance with the initial data, which is partially provided by the user via a function parameter. We assign the values of the objectID property, the actors, and the logger properties. The violation timestamp, \gls{id}, and status properties are ignored and set to a default value. Finally, the artwork data is associated with the newly minted artwork in the \texttt{artworks} mapping.
 
 \subsubsection{updateArtworkData}
-The data associated with an artwork can be updated by calling this function. Upon successful update, the function does not actually return anything but emits an event with the updated values. This is based on a limitation of Solidity where it is not possible to return an object from a state-changing function. Additionally, this function allows you to update multiple fields at once. This has some advantages:
+The data associated with an artwork can be updated by calling this function. Upon successful update, the function does not return anything but emits an event with the updated values. This is based on a limitation of Solidity where it is impossible to return an object from a state-changing function. Additionally, this function allows you to update multiple fields at once. This has some advantages:
 
 \begin{itemize}[align=left, font=\itshape]
     \item[simplified interface:] Using only one update function instead of exposing an update function for each field reduces the number of public functions. This results in a more understandable and usable contract.
@@ -121,7 +122,7 @@ The data associated with an artwork can be updated by calling this function. Upo
     lastline=137
 ]{codesnippets/smartcontract.sol}
 
-The \texttt{updateArtworkData} expects the updated data as a parameter of the type ArtworkData. Solidity expects every field of the \texttt{data} parameter to be populated. This is why we check for each field if the value should be updated and in turn, execute the according update. For string fields, this check is done by checking the length of the incoming string. An empty string with length $0$ indicates that the user did not update this field. The same check is not possible with addresses. This is why we decided to use the address $0$x$00...001$ to mark an empty address update field. The zero address $(0$x$0)$ is reserved to remove an address from a field.
+The \texttt{updateArtworkData} expects the updated data as a parameter of the type ArtworkData. Solidity expects every field of the \texttt{data} parameter to be populated. This is why we check for each field if the value should be updated and execute the according update. For string fields, this check is done by checking the length of the incoming string. An empty string with length $0$ indicates that the user did not update this field. The same check is not possible with addresses. This is why we used the address $0$x$00...001$ to mark an empty address update field. The zero address $(0$x$0)$ is reserved to remove an address from a field.
 
 The code to update artwork properties differs in complexity. For the \texttt{violationTimestamp} field it is as simple as assigning the new timestamp to the corresponding artwork: 
 \begin{lstlisting}[language=Solidity]
@@ -137,7 +138,7 @@ This works identically for updating the roles and the objectID. When updating th
 
 \paragraph{Updating the transportation status}
 \label{sec:update_status}
-The logic behind updating the status (Figure \ref{fig:update_status}) is more complex. The reason for this is the multi-approval feature of this contract. To satisfy our use case it is necessary for the actors to agree on the transportation status of the artwork. To ensure this agreement, each of the affected actors has to submit an update request with the same value. Only if this requirement is satisfied the binding transportation status is updated. 
+The logic behind updating the status (Figure \ref{fig:update_status}) is more complex. The reason for this is the multi-approval feature of this contract. To satisfy our use case, the actors must agree on the transportation status of the artwork. To ensure this agreement, each affected actor must submit an update request with the same value. Only if this requirement is satisfied, the binding transportation status is updated. 
 
 \begin{figure}[ht]
     \centering
@@ -146,11 +147,11 @@ The logic behind updating the status (Figure \ref{fig:update_status}) is more co
     \label{fig:update_status}
 \end{figure}
 
-To differentiate between the status that actors want to change to and the status which is currently in place we introduced two variables: \texttt{requestedStatus} and \texttt{currentStatus}. Users are able to request a status change by submitting a new \texttt{requestedStatus}. If this value does not match the previous value all approvals are reset and the \texttt{requestedStatus} field is set to the new value. The next step is to set the approval for the actor who sent the initial update request. Because different actors need to approve different status changes, we need to check for the three distinct cases.
+To differentiate between the status that actors want to change to and the status which is currently in place we introduced two variables: \texttt{requestedStatus} and \texttt{currentStatus}. Users can request a status change by submitting a new \texttt{requestedStatus}. If this value does not match the previous value, all approvals are reset, and the \texttt{requestedStatus} field is set to the new value. The next step is to set the approval for the actor who sent the initial update request. Because different actors must approve different status changes, we need to check for the three distinct cases.
 
-If the status is requested to change from TO\_BE\_DELIVERED to IN\_TRANSIT the carrier and the owner must approve that change. This check is performed analogously for the change from IN\_TRANSIT to DELIVERED. Lastly, the decision to change from DELIVERED to TO\_BE\_DELIVERED is made by the owner alone. Any other combination of status change is not allowed and the transaction will be reverted.
+If the status is requested to change from TO\_BE\_DELIVERED to IN\_TRANSIT, the carrier and the owner must approve that change. This check is performed analogously for the change from IN\_TRANSIT to DELIVERED. Lastly, the owner makes the decision to change from DELIVERED to TO\_BE\_DELIVERED. Any other combination of status changes is not allowed, and the transaction will be reverted.
 
-If the right approvals have already been made the function will update the \texttt{currentStatus} automatically and terminate. If any approval is missing it will terminate without updating the \texttt{currentStatus}. In that case, the actor in question must submit their own request for a status update.
+If the right approvals have already been made, the function will automatically update the \texttt{currentStatus} and terminate. If any approval is missing, it will terminate without updating the \texttt{currentStatus}. In that case, the actor in question must submit their own request for a status update.
 
 \subsubsection{getArtworkData}
 The function to retrieve data about an artwork is the simplest one. It merely returns the \texttt{ArtworkData} object mapped to the requested artwork \gls{id}. To easily convert the returned tuple to an object using the contract \gls{abi}, each property is mapped to the tuple entry specified in the function signature, visible in Listing \ref{lst:scget}.
@@ -165,7 +166,7 @@ The function to retrieve data about an artwork is the simplest one. It merely re
 
 \clearpage
 \section{artis-server}
-The server is the central part of the system, it connects the end users to the \gls{sc}. The responsibilities of the server can be separated into three layers. The files of the server's directory structure depicted in Figure \ref{fig:server_directory_structure} and the corresponding code will be explained in the next sections. The server code is implemented in Python using a variety of libraries that will be addressed later on.
+The server is the central part of the system; it connects the end users to the \gls{sc}. The responsibilities of the server can be separated into three layers. The files of the server's directory structure depicted in Figure \ref{fig:server_directory_structure} and the corresponding code will be explained in the next sections. The server code is implemented in Python using a variety of libraries that will be addressed later on.
 
 \begin{figure}
     \centering
@@ -176,7 +177,7 @@ The server is the central part of the system, it connects the end users to the \
 
 \subsection{Authentication Layer}
 \label{sec:authentication_layer}
-To implement the authentication flow described in section \ref{sec:authentication} we defined an \texttt{Authenticator} class, which handles the server-side logic. This class implements functions provided by the thirdweb library \cite{thirdweb} but has been adapted to fit our specific use case. The functionality described in this section is exposed by the \gls{api} via the endpoints listed in Table \ref{tab:authentication_endpoints}
+To implement the authentication flow described in section \ref{sec:authentication}, we defined an \texttt{Authenticator} class, which handles the server-side logic. This class implements functions provided by the third web library \cite{thirdweb} but has been adapted to fit our specific use case. The functionality described in this section is exposed by the \gls{api} via the endpoints listed in Table \ref{tab:authentication_endpoints}
 
 \lstinputlisting[
     language=Python,
@@ -186,7 +187,7 @@ To implement the authentication flow described in section \ref{sec:authenticatio
     lastline=15
 ]{codesnippets/authenticator.py}
 
-The method described in Listing \ref{lst:authpayload} constructs a dictionary with the information that is used to build the challenge message. The method is exposed by the \gls{api} layer via the \texttt{/auth/payload} endpoint as listed in Table \ref{tab:authentication_endpoints}. This dictionary is then returned to the client who constructs a message from the dictionary and signs it.
+The method described in Listing \ref{lst:authpayload} constructs a dictionary with the information used to build the challenge message. The method is exposed by the \gls{api} layer via the \texttt{/auth/payload} endpoint as listed in Table \ref{tab:authentication_endpoints}. This dictionary is then returned to the client who constructs a message from it and signs it.
 
 \lstinputlisting[
     language=Python,
@@ -196,11 +197,11 @@ The method described in Listing \ref{lst:authpayload} constructs a dictionary wi
     lastline=32
 ]{codesnippets/authenticator.py}
 
-The signed message is then sent back and verified by the \texttt{verify} method listed in Listing \ref{lst:authlogin}. After reconstructing the challenge message, the method recovers the account address that was used for the signature. If it matches the address specified in Line 7 of Listing \ref{lst:authpayload} the authentication request is valid. This proves that the user who sent the request actually is in possession of the specified account. To recover the address the python web3 library was used \cite{web3python}.
+The signed message is then sent back and verified by the \texttt{verify} method listed in Listing \ref{lst:authlogin}. After reconstructing the challenge message, the method recovers the account address that was used for the signature. If it matches the address specified in Line 7 of Listing \ref{lst:authpayload} the authentication request is valid. This proves that the user who sent the request has the specified account. To recover the address, the python web3 library was used \cite{web3python}.
 
-If the authentication request succeeded the client will issue a \gls{jwt} which is signed by the server wallet. This token is then used to authenticate further requests until it expires. The \gls{jwt}'s signature as well as the expiration date are verified upon each request by the \texttt{Authenticator} class. The \texttt{Authenticator} exposes this functionality with the \texttt{/auth/login} endpoint.
+If the authentication request succeeds the client will issue a \gls{jwt} signed by the server wallet. This token is then used to authenticate further requests until it expires. The \gls{jwt}'s signature and expiration date are verified upon each request by the \texttt{Authenticator} class. The \texttt{Authenticator} exposes this functionality with the \texttt{/auth/login} endpoint.
 
-There are two additional authentication endpoints exposed by the \gls{api}. \texttt{/auth/logout} closes the session and \texttt{/auth/user} returns information about the subject of a \gls{jwt}. It can be queried to check if the session is still active and react accordingly on the client side.
+Two additional authentication endpoints are exposed by the \gls{api}. \texttt{/auth/logout} closes the session and \texttt{/auth/user} returns information about the subject of a \gls{jwt}. It can be queried to check if the session is still active and react accordingly on the client side.
 
 \subsection{API Layer}
 To expose the functionality defined in the use case and implemented in the \gls{sc}, it is enough to implement four different \gls{api} endpoints. The authentication mechanism described in Section \ref{sec:authentication_layer} provides another set of four endpoints.
@@ -234,7 +235,7 @@ To expose the functionality defined in the use case and implemented in the \gls{
 \caption{\gls{api} endpoints}
 \end{table}
 
-The \gls{json} schema of the artwork resource is shown in Listing \ref{lst:artwork}. Such a \gls{json} object is returned by both of the \texttt{/artworks/<int:artwork\_id>} endpoints. The properties marked with an arrow ($\rightarrow$) can be included in the body of a PATCH request to \texttt{/artworks/<int:artwork\_id>}. The POST request to \texttt{/artworks} expects the same body except for the \texttt{requestedStatus} property which cannot be set and the \texttt{owner} property which can be set to mint an artwork \gls{nft} for someone else. The request body is validated using the models defined in the \texttt{src/models/} folder. This is done by leveraging the functionality to define custom schemas and fields of the Marshmallow \cite{marshmallow} package.
+The \gls{json} schema of the artwork resource is shown in Listing \ref{lst:artwork}. Such a \gls{json} object is returned by both of the \texttt{/artworks/<int:artwork\_id>} endpoints. The properties marked with an arrow ($\rightarrow$) can be included in the body of a PATCH request to \texttt{/artworks/<int:artwork\_id>}. The POST request to \texttt{/artworks} expects the same body except for the \texttt{requestedStatus} property which cannot be set and the \texttt{owner} property which can be set to mint an artwork \gls{nft} for someone else. The request body is validated using the models defined in the \texttt{src/models/} folder. This is done by leveraging the functionality to define custom schemas, and fields of the Marshmallow \cite{marshmallow} package.
 
 \lstinputlisting[
     language=JSON,
@@ -264,9 +265,9 @@ To build the \gls{api} application we used Flask \cite{flask}. The entry point o
 
 
 \subsection{Application Layer}
-The application layer is responsible for connecting to the \gls{sc} and submitting the transactions needed to fulfill the \gls{api} request. To do this we are using the python web3 library \cite{web3python}. This functionality is defined in the \texttt{/src/smartcontract/ArtworkConnector.py} file. It defines a class which extends the \texttt{SmartContractConnector} abstract class. The \texttt{SmartContractConnector} class contains code that is generally necessary to connect to a \gls{sc}. This includes setting up the Web3 provider, as well as the account to submit the transactions, and adding some middleware. Additionally we decided to define two abstractmethods that fetch the contract address and contract \gls{abi} dynamically. This ensures that the \gls{api} is always connected to the newest contract. In our case we used github variables to store the contract address and the Etherscan \cite{etherscan} \gls{api} to query the \gls{abi}. With this setup we built an extensible platform that can add endpoints to connect to additional \glspl{sc} more easily. 
+The application layer connects to the \gls{sc} and submits the transactions needed to fulfill the \gls{api} request. To do this we are using the python web3 library \cite{web3python}. This functionality is defined in the \texttt{/src/smartcontract/ArtworkConnector.py} file. It defines a class that extends the \texttt{SmartContractConnector} abstract class. The \texttt{SmartContractConnector} class contains code that is generally necessary to connect to a \gls{sc}. This includes setting up the Web3 provider, as well as the account to submit the transactions, and adding some middleware. Additionally, we decided to define two \textit{abstractmethods} that fetch the contract address and contract \gls{abi} dynamically. This ensures that the \gls{api} is always connected to the newest contract. In our case, we used GitHub variables to store the contract address and the Etherscan \cite{etherscan} \gls{api} to query the \gls{abi}. With this setup, we built an extensible platform that can add endpoints to connect to additional \glspl{sc} more easily. 
 
-The \texttt{ArtworkConnector} class basically has the same interface as the solidity contract. As shown in Listing \ref{lst:artworkconnector} each public method directly connects to a \gls{sc} method. Web3.py provides a simple to use smart contract proxy object which we stored in the class variable \texttt{self.\_contract}. This object makes all the contract functions available with the \texttt{functions} property. To call a contract function it suffices to execute \lstinline[language=Python]!self._contract.functions.<function_name>(<input>).call()!.
+The \texttt{ArtworkConnector} class basically has the same interface as the solidity contract. As shown in Listing \ref{lst:artworkconnector}, each public method directly connects to a \gls{sc} method. Web3.py provides a simple-to-use smart contract proxy object which we stored in the class variable \texttt{self.\_contract}. This object makes all the contract functions available with the \texttt{functions} property. To call a contract function it suffices to execute \lstinline[language=Python]!self._contract.functions.<function_name>(<input>).call()!.
 This will return the value from the \gls{sc} and can more or less be directly returned to the user. If the function mutates the state of the contract we need to use \lstinline[language=Python]!.transact()! and a transaction hash is returned instead. We use this transaction hash to wait for the transaction receipt and extract the data from the emitted events. This is done by the helper function \texttt{self.\_handleEvent}.
 
 \lstinputlisting[
@@ -277,7 +278,7 @@ This will return the value from the \gls{sc} and can more or less be directly re
 
 \clearpage
 \section{artis-rockpi-logger}
-\begin{wrapfigure}[16]{O}{0.5\textwidth}
+\begin{wrapfigure}[16]{O}{0.5\textwidth} %do not use wrapped figures
     \centering
     \includegraphics[width=0.49\textwidth]{resources/rock-pi.png}
     \caption{Rock Pi with a DHT-22 sensor} 
@@ -305,7 +306,7 @@ The function will attempt to read multiple times (up to the specified retries) u
     label=lst:loggingscript
 ]{codesnippets/logging_script.py}
 
-In Listing \ref{lst:loggingscript} you can see that the script is executing the \texttt{read\_retry} function in an endless loop and whenever the reading has been successful it stores the data along with a timestamp of the reading in seconds and in a readable format in a local database.
+In Listing \ref{lst:loggingscript}, you can see that the script is executing the \texttt{read\_retry} function in an endless loop, and whenever the reading has been successful it stores the data along with a timestamp of the reading in seconds and in a readable format in a local database.
 
 The logger contains a second important script which is run simultaneously. The \texttt{violation\_script.py} is executed with the predefined temperature and humidity thresholds and the corresponding artwork \gls{id}.
 
@@ -323,22 +324,17 @@ To authenticate to the \gls{api}, the logger follows the same authentication flo
 
 \clearpage
 \section{artis-frontend}
-The last component of the system is the user interface. It is built using React \cite{react}. The styling is done with Tailwind CSS \cite{tailwindcss}. The main benefit of the user interface is to enable a seamless login and authentication flow. This is done using Metamask \cite{metamask} as a wallet provider and the thirdweb library to interface with it. 
+The last component of the system is the user interface. It is a single-page application built with React \cite{react} and TypeScript. The styling is done with Tailwind CSS \cite{tailwindcss}. These technologies were selected due to the author's prior experience. Theoretically, the user interface is not required to interact with the system. However, simple authentication is a large benefit of the user interface. Its integration with Metamask \cite{metamask} enables a seamless login and authentication flow. From a code perspective thirdweb \cite{thirdweb} is used to access the \gls{api} of Metamask.
 
 \begin{figure}[h]
     \centering
-    \begin{subfigure}{0.65\textwidth}
-        \includegraphics[width=\textwidth]{resources/frontend_screenshots/welcome_screen.png}
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{resources/frontend_screenshots/welcome_screen.png}
         \caption{Welcome Screen}
         \label{fig:welcome_screen}
         \vspace*{2mm}
     \end{subfigure}
-\end{figure}
-
-An unauthenticated user is first landing on this welcome page with a button to connect the website to Metamask as shown in Figure \ref{fig:welcome_screen}. After pressing the button Metamask opens a pop-up to select the account to connect to the website (Figure \ref{fig:connecting_metamask}). Finally the button label changes to "Sign in" and as soon as the user presses the button again, a signature request is sent to the server. The message that is visible on the pop-up in Figure \ref{fig:sign_in} is a message constructed from the response of the POST \texttt{/auth/payload} request.
-
-\begin{figure}[h!]
-    \ContinuedFloat
     \begin{subfigure}{\textwidth}
         \centering
         \includegraphics[width=0.8\textwidth]{resources/frontend_screenshots/connecting_wallet.png}
@@ -347,19 +343,27 @@ An unauthenticated user is first landing on this welcome page with a button to c
     \end{subfigure}
 \end{figure}
 
+An unauthenticated user first lands on this welcome page with a button to connect the website to Metamask as shown in Figure \ref{fig:welcome_screen}. After pressing the button, Metamask opens a pop-up to select an account to connect to the website (Figure \ref{fig:connecting_metamask}). Finally, the button label changes to "Sign in" and as soon as the user presses the button again, a signature request is sent to the server. The message that is visible on the pop-up in Figure \ref{fig:sign_in} is a message constructed from the response of the POST \texttt{/auth/payload} request.
+
 Once the user signs this message the signature is sent back to the server, validated and an authentication token is issued. The user is now logged in and is able to see all the artworks by their \glspl{id} that are associated with the logged-in account (Figure \ref{fig:artworks_page}).
 
-\begin{figure}
+\begin{figure}[h!]
+    \ContinuedFloat
+    \begin{subfigure}{\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{resources/frontend_screenshots/sign_in.png}
+        \caption{Sign in request}
+        \label{fig:sign_in}
+        \vspace*{2mm}
+    \end{subfigure}
+\end{figure}
+
+\begin{figure}[h]
     \ContinuedFloat
     \centering
     \begin{subfigure}{\textwidth}
-        \includegraphics[width=\textwidth]{resources/frontend_screenshots/sign_in.png}
-        \caption{Sign in request}
-        \label{fig:sign_in}
-        \vspace*{8mm}
-    \end{subfigure}
-    \begin{subfigure}{\textwidth}
-        \includegraphics[width=\textwidth]{resources/frontend_screenshots/artworks_page.png}
+        \centering
+        \includegraphics[width=0.8\textwidth]{resources/frontend_screenshots/artworks_page.png}
         \caption{Artworks page}
         \label{fig:artworks_page}
     \end{subfigure}
@@ -367,18 +371,23 @@ Once the user signs this message the signature is sent back to the server, valid
     \label{fig:sign_in_process}
 \end{figure}
 
-The artwork page shows a colorful tile representing an artwork. Each tile is labeled with the corresponding artwork \gls{id}. The tabs on the top can be selected to view all the artworks where the account is registered \textit{e.g.} the user might be the owner of artwork $1$ but the recipient of artwork $2$. To create a new artwork \gls{nft}, the user can click on the transparent tile at the bottom. This will open up a modal where the user can enter details about the artwork (Figure \ref{fig:mint_modal}. To view more details about an existing artwork the user can click on a tile to open up the detail view shown in Figure \ref{fig:artwork_detail}.
+The artwork page shows a colorful tile representing an artwork. Each tile is labeled with the corresponding artwork \gls{id}. The tabs on the top can be selected to view all the artworks where the account is registered \textit{e.g.} the user might be the owner of artwork $1$ but the recipient of artwork $2$. 
 
 \begin{figure}
     \centering
-    \begin{minipage}{0.45\textwidth}   
-        \includegraphics[width=0.9\textwidth]{resources/frontend_screenshots/mint_modal.png}
-        \caption{Artwork mint Modal}
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[height=0.4\textheight]{resources/frontend_screenshots/mint_modal.png}
+        \caption{Artwork mint modal}
         \label{fig:mint_modal}
     \end{minipage}\hfill
     \begin{minipage}{0.45\textwidth}
-        \includegraphics[width=0.9\textwidth]{resources/frontend_screenshots/artwork_details.png}
+        \centering
+        \includegraphics[height=0.4\textheight]{resources/frontend_screenshots/artwork_details.png}
         \caption{Artwork detail view}
         \label{fig:artwork_detail}
     \end{minipage}
 \end{figure}
+
+To create a new artwork \gls{nft}, the user can click on the transparent tile at the bottom. This will open up a modal where the user can enter details about the artwork (Figure \ref{fig:mint_modal}). To view more details about an existing artwork the user can click on a tile to open up the detail view shown in Figure \ref{fig:artwork_detail}. This view displays important information like the status of the artwork, the role the user is registered as, and the timestamp of the most recent violation if any occurred. Further, the user can edit values by switching on the edit mode with the switch on the top right.  
+
