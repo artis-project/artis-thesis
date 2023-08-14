@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2023-07-30T09:06:18.676Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.5 Chrome/114.0.5735.243 Electron/25.3.1 Safari/537.36" etag="ny7csiAaPWZ7cy5uVXbA" version="21.6.5" type="device">
+<mxfile host="Electron" modified="2023-08-01T12:17:13.929Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.5 Chrome/114.0.5735.243 Electron/25.3.1 Safari/537.36" etag="Ui4zCo1_UW4UX4anGO3k" version="21.6.5" type="device">
   <diagram id="ueo7mvtwTdWJJ7_IZG4s" name="Seite-1">
-    <mxGraphModel dx="836" dy="631" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="851" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -39,7 +39,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="GqR5pssrANM1ScbAsOte-14" value="PATCH - environmental sensor data" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="GqR5pssrANM1ScbAsOte-14" value="PATCH - violation timestamp" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="519.85" y="503" width="85" height="60" as="geometry" />
         </mxCell>
         <mxCell id="GqR5pssrANM1ScbAsOte-34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="GqR5pssrANM1ScbAsOte-15" target="GqR5pssrANM1ScbAsOte-29" edge="1">
