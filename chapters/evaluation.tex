@@ -80,18 +80,19 @@ The average response time of updating an \gls{nft} vary depending on the input p
 \subsection*{Non-Mutating Functions}
 The GET endpoints exposed by the \gls{api} target several functions that do not mutate the state of the \gls{sc}. These functions do not cost any gas and their execution time is much less (usually < 1 Second). Additionally, the artis-server adds a caching layer to these function calls which generally reduce the response time of repeated calls to a few milliseconds. 
 
+\clearpage
 \section{Field Test}
 \label{sec:field_test}
-Because the isolated analyses performed above do not indicate how the system would perform during an artwork transportation scenario, we used the system on a simulated transportation scenario. The steps of the simulated scenario are visualized in Figure \ref{fig:eval_scenario} and described in more detail below.
+Because the isolated analyses performed above do not indicate how the system would perform during an artwork transportation scenario, we used the system on a simulated transportation scenario.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth]{diagrams/evaluation_scenario_v2.drawio.pdf}
-    \caption{Caption}
+    \includegraphics[width=0.9\textwidth]{diagrams/evaluation_scenario_v2.drawio.pdf}
+    \caption{Field test scenario}
     \label{fig:eval_scenario}
 \end{figure}
 
-The field test involves a minimum of five requests to the \gls{api}. If any violations occur this number is increased accordingly. In our field test we simulated a temperature violation by covering the sensor with our hand (Figure \ref{fig:cover_sensor}).
+The steps of the simulated scenario are visualized in Figure \ref{fig:eval_scenario} and described in more detail below.
 
 \begin{enumerate}
     \item create a new artwork \gls{nft} and register the corresponding roles using the artis-frontend.
@@ -104,7 +105,9 @@ The field test involves a minimum of five requests to the \gls{api}. If any viol
     \item approve this request from the recipient account
 \end{enumerate}
 
-\begin{figure}[h!]
+The field test involves a minimum of five requests to the \gls{api}. If any violations occur this number is increased accordingly. To also include a violation in the test, we simulated a temperature violation by covering the sensor with our hand (Figure \ref{fig:covering_sensor}).
+
+\begin{figure}[ht]
     \begin{subfigure}{0.5\textwidth}
         \centering
         \includegraphics[height=0.25\textheight]{resources/field_test.jpeg}
@@ -116,15 +119,44 @@ The field test involves a minimum of five requests to the \gls{api}. If any viol
         \centering 
         \includegraphics[height=0.25\textheight]{resources/cover_sensor.jpeg}
         \caption{Simulating temperature violation}
-        \label{fig:covering sensor}
+        \label{fig:covering_sensor}
     \end{subfigure}
     \caption{System Field Test}
     \label{fig:field_test}
 \end{figure}
 
+During the field test we recorded different metrics now used for evaluation. The most important metrics include a cost analysis of the field test as well as evaluating the performance of the logger.
 
 \subsection{Cost}
+During our field test nine transactions were issued by the \gls{api}. The cost analysis also includes the cost for deploying the \gls{sc} and minting the \gls{nft}, however this would be a one time cost and its significance will shrink with the number of transportations. An overview of the transactions and estimated costs is given in Table \ref{tab:field_test_tx_fees} The costs are estimated in the same manner as in Section \ref{sec:cost_and_performance}, however the transactions were not issued with a fixed gas price but an estimation was made for each transaction based on the network at the time. 
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcl}
+\multicolumn{1}{c}{\textbf{Transaction}} & \multicolumn{1}{l}{\textbf{Count}} & \textbf{Total Cost} \\ \hline
+Contract deployment                      & one time                           & 141.50 CHF          \\
+mint NFT                                 & one time                           & 11.86 CHF           \\
+update status                            & 2                                  & 9.10 CHF            \\
+approve status                           & 2                                  & 7.56 CHF            \\
+report violation                         & 3                                  & 9.54 CHF            \\ \hline
+\textbf{Total}                           & \textbf{9}                         & \textbf{179.56 CHF} \\
+\hline
+\end{tabular}
+\caption{Transaction fees field test}
+\label{tab:field_test_tx_fees}
+\end{table}
+
+The total cost of the field test mainly consists of the contract deployment. This transaction accounts for over 78\% of the total cost. The variable cost of the field test amount to 26.2 \gls{chf}.
+
 \subsection{Logger performance}
+During the transportation the logger stored every sensor reading in a local database. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{diagrams/sensor_eval.drawio.pdf}
+    \caption{Timeline with sensor readings}
+    \label{fig:field_test_sensor_readings}
+\end{figure}
 
 
 \section{Discussion}
