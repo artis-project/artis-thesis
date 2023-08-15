@@ -98,7 +98,7 @@ The steps of the simulated scenario are visualized in Figure \ref{fig:eval_scena
     \item create a new artwork \gls{nft} and register the corresponding roles using the artis-frontend.
     \item request the status of the artwork to be changed to \textit{IN\_TRANSIT} from the sender account
     \item approve this request from the carrier account
-    \item enable the logger by starting the \textit{logging\_script} and the \textit{violation\_script} with the thresholds of 27 degrees Celcius and 70\% humidity.
+    \item enable the logger by starting the \textit{logging\_script} and the \textit{violation\_script} with the thresholds of 25 degrees Celcius and 70\% humidity.
     \item take the logging device and transport it from point of departure to destination
     \item during the transportation simulate a violation by wrapping a hand around the sensor to increase the temperature.
     \item upon arrival request the status of the artwork to be changed to \textit{DELIVERED} from the carrier account
@@ -149,11 +149,11 @@ report violation                         & 3                                  & 
 The total cost of the field test mainly consists of the contract deployment. This transaction accounts for over 78\% of the total cost. The variable cost of the field test amount to 26.2 \gls{chf}.
 
 \subsection{Logger performance}
-During the transportation the logger stored every sensor reading in a local database. 
+The field test lasted around 52 minutes. During the transportation the logger stored every sensor reading in a local database. Figure \ref{fig:field_test_sensor_readings} illustrates the intervals of the sensor readings. Each line indicates a successful reading by the sensor, the red lines represent a violation. The maximum time between two readings was 9 minutes and 36 seconds. The shortest interval was less than a second.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
-    \includegraphics[width=0.9\textwidth]{diagrams/sensor_eval.drawio.pdf}
+    \includegraphics[width=\textwidth]{diagrams/sensor_eval.drawio.pdf}
     \caption{Timeline with sensor readings}
     \label{fig:field_test_sensor_readings}
 \end{figure}
