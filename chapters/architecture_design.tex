@@ -91,12 +91,12 @@ The backend server is designed to provide an abstracted form of interaction to t
 \paragraph{Authentication}
 \label{sec:authentication}
 
-\begin{wrapfigure}{o}{0.6\textwidth} %center the figure
+\begin{figure}[h]
     \centering
     \includegraphics[width=0.59\textwidth, keepaspectratio]{diagrams/authentication_flow.drawio.pdf}
     \caption{Authentication flow}
     \label{fig:auth_flow}
-\end{wrapfigure}
+\end{figure}
 
 The authentication flow visualized in Figure \ref{fig:auth_flow} is using signature verification of cryptographically signed messages to prove ownership over an Ethereum account. To do this a challenge message is generated upon authentication request. This message contains relevant information to the session such as the start of the session, the duration of the session, and for which account the session is created. The message is then signed by the private key of the requester's wallet and sent back. The signature can then be verified against the recovered address and if the requested address and recovered address match, this proves that the request was made by an actor who is the owner of the private key corresponding to the account, assuming that the private key was not compromised.
 

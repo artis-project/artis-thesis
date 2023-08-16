@@ -8,7 +8,9 @@ The primary cost factor of the artis-system is the \gls{sc}. Each execution of a
 $$
 transaction\ fee = gas \times gas\ price
 $$
-To analyze the execution costs of the \textit{safeMint} and \textit{updateArtworkData} contract functions, we executed the corresponding requests of the developed \gls{api} multiple times $(n = 10)$ for each input variety. This analysis was conducted on the sepolia testnet and the resulting transactions were inspected on the Etherscan block explorer. The transactions were submitted with a relatively high gas price (30 Gwei) to make the transactions attractive for validators \cite{ethergas}. During this analysis we observed that the gas used for a specific function depends on the input parameters but does not vary at all if the input parameters are the same. To analyze the performance we also recorded the processing time of each request. This time can be an indicator of the performance but depends on the state of the blockchain and likely differs on the mainnet.
+To analyze the execution costs of the \textit{safeMint} and \textit{updateArtworkData} contract functions, we executed the corresponding requests of the developed \gls{api} multiple times $(n = 10)$ for each input variety. This analysis was conducted on the sepolia testnet and the resulting transactions were inspected on the Etherscan block explorer. The transactions were submitted with a relatively high gas price (30 Gwei) to make the transactions attractive for validators \cite{ethergas}. During this analysis, we observed that the gas used for a specific function depends on the input parameters but does not vary at all if the input parameters are the same. To analyze the performance we also recorded the processing time of each request. This time can be an indicator of the performance but depends on the state of the blockchain and likely differs on the mainnet.
+
+To get a sense of how gas translates into fees we used the average gas price of the past month for the Ethereum mainnet (28 Gwei, 07.08.23 - 08.08.23) \cite{gaspriceaverageethereum} and the current value of Ether in \gls{chf} (1625.20 CHF = 1 ETH, 09.08.23) \cite{coinmarketcap}. Because the contract can also be deployed on other blockchains that use the \gls{evm}, we decided to include the cost on the polygon network. Except the contract has not been deployed to the Polygon network and the same amount of gas was used for these calculations. The average gas price of the past month (173 Gwei \cite{gaspriceaveragepolygon}, 07.08.23 - 08.08.23) was multiplied by the gas and converted into \gls{chf} by using the current price for MATIC (0.60 CHF = 1 MATIC, 09.08.23) \cite{coinmarketcap}. The results were rounded to four decimal points for the tokens and two decimal points for \gls{chf}.
 
 \begin{figure}[ht]
     \begin{subfigure}{0.49\textwidth}
@@ -27,24 +29,23 @@ To analyze the execution costs of the \textit{safeMint} and \textit{updateArtwor
 \end{figure}
 
 \subsection*{safeMint}
-Figure \ref{fig:safemint_tx_cost} shows the average gas consumed by the safeMint function for a variety of input parameters. Each bar shows the average of 10 function executions. The very left bar shows the average gas used if only the objectID of the artwork is added during minting. The second bar shows the gas consumed if the objectID and the recipient address are provided during minting. This pattern remains the same for the last two bars. The analysis shows that the more parameters are provided the more gas it consumes.
-
-To get a sense of how gas translates into fees we used the average gas price of the past month for the Ethereum mainnet (28 Gwei) \cite{gaspriceaverage} and the current value of Ether in \gls{chf} (1599.32 CHF = 1 ETH) \cite{coinmarketcap}. The results are listed in Table \ref{tab:safemint_tx_fees}. The results show that each artwork \gls{nft} minted costs between 7.71 \gls{chf} and 10.31 \gls{chf}.  
+Figure \ref{fig:safemint_tx_cost} shows the average gas consumed by the safeMint function for a variety of input parameters. Each bar shows the average of 10 function executions. The very left bar shows the average gas used if only the objectID of the artwork is added during minting. The second bar shows the gas consumed if the objectID and the recipient address are provided during minting. This pattern remains the same for the last two bars. The analysis shows that the more parameters are provided the more gas it consumes. Table \ref{tab:safemint_tx_fees} shows the transaction fees in the corresponding native token as well as converted into \gls{chf} as outlined above. 
 
 \begin{table}[h]
+\begin{adjustbox}{width=1\textwidth}
 \begin{tabular}{cllll}
-                                          & \textbf{only objectID} & \textbf{+recipient} & \textbf{+carrier} & \textbf{+logger} \\ \cline{2-5} 
-\multirow{2}{*}{\textbf{Transaction fee}} & 0.0048 ETH             & 0.0053 ETH          & 0.0059 ETH        & 0.0064 ETH       \\
-                                          & 7.71 CHF               & 8.47 CHF            & 9.39 CHF          & 10.31 CHF       
+\multicolumn{1}{l}{}                                                           & \textbf{only objectID} & \textbf{+recipient} & \textbf{+carrier} & \textbf{+logger} \\ \hline 
+\textbf{\begin{tabular}[c]{@{}c@{}}transaction fee\\ ETH (MATIC)\end{tabular}} & 0.0048 (0.0293)        & 0.0053 (0.0322)     & 0.0059 (0.0357)   & 0.0064 (0.0392)  \\ \hline
+\textbf{\begin{tabular}[c]{@{}c@{}}in CHF \\ Ethereum (Polygon)\end{tabular}}  & 7.83 (0.02)            & 8.61 (0.02)         & 9.54 (0.02)       & 10.47 (0.02)    
 \end{tabular}
-\caption{Estimated transaction fees for safeMint}
+\end{adjustbox}
+\caption{Estimated transaction fees safeMint}
 \label{tab:safemint_tx_fees}
 \end{table}
 
-The reponse time of the \gls{api} calls are mostly below 10s. We were not able to observe a large difference when it comes to the different input parameters. The chart in Figure \ref{fig:safemint_tx_speed} shows the average response time in seconds. The maximum response time recorded was 33s on the fifth call with only the objectID submitted and the minimum was 3s with the objectID and recipient address submitted. This shows that this metric can fluctuate heavily depending on the state of the network.
+The response time of the \gls{api} calls are mostly below 10s. We were not able to observe a large difference when it comes to the different input parameters. The chart in Figure \ref{fig:safemint_tx_speed} shows the average response time in seconds. The maximum response time recorded was 33s on the fifth call with only the objectID submitted and the minimum was 3s with the objectID and recipient address submitted. This shows that this metric can fluctuate heavily depending on the state of the network.
 
-\subsection*{updateArtworkData}
-\begin{figure}[h!]
+\begin{figure}[ht]
     \begin{subfigure}{0.49\textwidth}
         \includegraphics[width=\textwidth]{diagrams/updateArtworkData_gas_eval.pdf}
         \caption{Transaction gas usage}
@@ -60,32 +61,55 @@ The reponse time of the \gls{api} calls are mostly below 10s. We were not able t
     \label{fig:updateArtworkData_analysis}
 \end{figure}
 
+\subsection*{updateArtworkData}
 Similarly, we also conducted an analysis of the updateArtworkData function. The bar on the very left of Figure \ref{fig:updateArtworkData_tx_cost} shows the average gas consumed by the function when updating the requested status. Approving the status as a different actor then shows an average gas consumption of 82'662. The last two bars show the gas amount for reporting a violation from the logger and registering a carrier respectively.
 
 The cost of these transactions was estimated in the same manner as with the safeMint function (Table \ref{tab:updateArtworkData_tx_fees}). The results show that updating an artwork \gls{nft} is much less costly than minting it. 
 
-\begin{table}[ht]
+\begin{table}[h]
+\begin{adjustbox}{width=1\textwidth}
 \begin{tabular}{cllll}
-                                          & \textbf{update status} & \textbf{approve status} & \textbf{report violation} & \textbf{register carrier} \\ \cline{2-5} 
-\multirow{2}{*}{\textbf{Transaction fee}} & 0.0028 ETH             & 0.0024 ETH          & 0.0023 ETH        & 0.0023 ETH       \\
-                                          & 4.54 CHF               & 3.77 CHF            & 3.70 CHF          & 3.67 CHF       
+\multicolumn{1}{l}{}                                                           & \textbf{update status} & \textbf{approve status} & \textbf{report violation} & \textbf{register carrier} \\ \hline 
+\textbf{\begin{tabular}[c]{@{}c@{}}transaction fee\\ ETH (MATIC)\end{tabular}} & 0.0028 (0.0173)        & 0.0024 (0.0143)     & 0.0023 (0.0141)   & 0.0023 (0.014)  \\ \hline
+\textbf{\begin{tabular}[c]{@{}c@{}}in CHF \\ Ethereum (Polygon)\end{tabular}}  & 4.62 (0.01)            & 3.83 (0.01)         & 3.76 (0.01)       & 3.73 (0.01)    
 \end{tabular}
-\caption{Estimated transaction fees for updateArtworkData}
+\end{adjustbox}
+\caption{Estimated transaction fees updateArtworkData}
 \label{tab:updateArtworkData_tx_fees}
 \end{table}
 
-The average response time of updating an \gls{nft} vary depending on the input parameters. The request which was fulfilled the fasted was approving a status change with around three Seconds. Interestingly, the longest response time of over 35 seconds was recorded on the same type of request.
+The average response time of updating an \gls{nft} varies depending on the input parameters. The request which was fulfilled the fasted was approving a status change in around three Seconds. Interestingly, the longest response time of over 35 seconds was recorded on the same type of request.
 
 
 \subsection*{Non-Mutating Functions}
-The GET endpoints exposed by the \gls{api} target several functions that do not mutate the state of the \gls{sc}. These functions do not cost any gas and their execution time is much less (usually < 1 Second). Additionally, the artis-server adds a caching layer to these function calls which generally reduce the response time of repeated calls to a few milliseconds. 
+The GET endpoints exposed by the \gls{api} target several functions that do not mutate the state of the \gls{sc}. These functions do not cost any gas and their execution time is much less (usually < 1 Second). Additionally, the artis-server adds a caching layer to these function calls which generally reduces the response time of repeated calls to a few milliseconds.
 
-\clearpage
+\section{Security Analysis}
+\label{sec:security_analysis}
+Since the system is intended to be used by different actors in a trust-less environment a security analysis is vital for the evaluation of the prototype. The following section discusses the different attack surfaces and evaluates the security risk.
+
+\subsection{Threat Scenarios}
+
+\subsubsection{Compromised Logger}
+The logging device is of great importance to the system, and a compromised device would lead to a compromised system altogether. We consider three different attack scenarios when it comes to the logger.
+\subsubsection{Software Exploitation}
+Currently, the device itself is not secured in any way. Any malicious actor could connect to the logger device and alter its software. This could include changing the violation thresholds, stopping the logging script, manipulating the local database of the readings, and more. The current system is not protected against this threat and thus the security risk is high.
+\subsubsection{Hardware Exploitation}
+The recordings can also be influenced externally by exploiting the hardware components. By gaining access to the logger device, a malicious actor could influence the environmental parameters in a minimal perimeter around the sensor and falsify the readings. This could result in violations even if the artwork itself was not affected or could prevent violations even if the artwork was affected. The current system is not protected against this threat and the security risk is high.
+\subsubsection{Compromised Credentials}
+The system only allows registered actors to make changes to the \gls{nft}. This is also true for the logger device which is authenticating to the system by signing a challenge message with a private key. If the private key is leaked a malicious actor could report violations even if none occurred. Currently, the private key is stored in an environment variable on the software. An attacker could easily retrieve the value of the private key by connecting to the logger. This indicates a high security risk for this threat.
+
+\subsection{Compromised Smart Contract}
+The state of the \gls{sc} could be influenced by a malicious actor by accessing it directly. The attacker would have to identify flaws in the contract code and find an exploit to manipulate artwork data. We estimate the security risk of finding a flaw in the code to be medium as the contract was tested during development and basic code-checking tools were not able to identify a vulnerability. The \gls{sc} only accepts transactions issued by the admin of the system. This means that if the credentials of the admin are leaked the attacker would have unlimited access to the \gls{sc}. In the current system, the private key of the admin is only stored on the artis-server. The server is deployed as a Google cloud run service and the private key is supplied by the Google secret manager. Because the secret manager is an industry-standard solution for managing sensitive data, the security risk for this threat scenario is estimated to be low.
+
+\subsection{Disclosure of Data}
+The data stored on the \gls{sc} could be sensitive depending on the specific use case. Currently, the \gls{sc} prevents unauthorized users from reading any data. However, the transactions submitted to update data can contain sensitive information. This information can be read by anyone that has access to the \gls{sc} address, admin address, or any of the actors' addresses. Because these addresses are not considered secrets, the system is considered to disclose all data to the public. This could introduce a high security risk for certain use cases.
+
 \section{Field Test}
 \label{sec:field_test}
 Because the isolated analyses performed above do not indicate how the system would perform during an artwork transportation scenario, we used the system on a simulated transportation scenario.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.9\textwidth]{diagrams/evaluation_scenario_v2.drawio.pdf}
     \caption{Field test scenario}
@@ -105,8 +129,6 @@ The steps of the simulated scenario are visualized in Figure \ref{fig:eval_scena
     \item approve this request from the recipient account
 \end{enumerate}
 
-The field test involves a minimum of five requests to the \gls{api}. If any violations occur this number is increased accordingly. To also include a violation in the test, we simulated a temperature violation by covering the sensor with our hand (Figure \ref{fig:covering_sensor}).
-
 \begin{figure}[ht]
     \begin{subfigure}{0.5\textwidth}
         \centering
@@ -125,39 +147,47 @@ The field test involves a minimum of five requests to the \gls{api}. If any viol
     \label{fig:field_test}
 \end{figure}
 
-During the field test we recorded different metrics now used for evaluation. The most important metrics include a cost analysis of the field test as well as evaluating the performance of the logger.
+The field test involves a minimum of five requests to the \gls{api}. If any violations occur this number is increased accordingly. To also include a violation in the test, we simulated a temperature violation by covering the sensor with our hand (Figure \ref{fig:covering_sensor}). During the test, we recorded different metrics now used for evaluation. The most important metrics include a cost analysis of the field test as well as an evaluation of the performance of the logger.
 
 \subsection{Cost}
-During our field test nine transactions were issued by the \gls{api}. The cost analysis also includes the cost for deploying the \gls{sc} and minting the \gls{nft}, however this would be a one time cost and its significance will shrink with the number of transportations. An overview of the transactions and estimated costs is given in Table \ref{tab:field_test_tx_fees} The costs are estimated in the same manner as in Section \ref{sec:cost_and_performance}, however the transactions were not issued with a fixed gas price but an estimation was made for each transaction based on the network at the time. 
+During our field test, nine transactions were issued by the \gls{api}. The cost analysis also includes the cost for deploying the \gls{sc} and minting the \gls{nft}, however, this would be a one-time cost and its significance will shrink with the number of transportations. An overview of the transactions and estimated costs is given in Table \ref{tab:field_test_tx_fees} The costs are estimated in the same manner as in Section \ref{sec:cost_and_performance}, however, the transactions were not issued with a fixed gas price but an estimation was made for each transaction based on the network at the time. 
 
-\begin{table}[h]
+The total cost of the field test mainly consists of the contract deployment. This transaction accounts for over 78\% of the total gas consumption, and thus also accounts for the greatest cost factor. The variable part which would be included in another similar transportation scenario of the same artwork amounts to around 25.85 \gls{chf} on the Ethereum network or around 0.05 \gls{chf} on the Polygon network.
+
+\begin{table}[ht]
 \centering
-\begin{tabular}{lcl}
-\multicolumn{1}{c}{\textbf{Transaction}} & \multicolumn{1}{l}{\textbf{Count}} & \textbf{Total Cost} \\ \hline
-Contract deployment                      & one time                           & 141.50 CHF          \\
-mint NFT                                 & one time                           & 11.86 CHF           \\
-update status                            & 2                                  & 9.10 CHF            \\
-approve status                           & 2                                  & 7.56 CHF            \\
-report violation                         & 3                                  & 9.54 CHF            \\ \hline
-\textbf{Total}                           & \textbf{9}                         & \textbf{179.56 CHF} \\
+\begin{tabular}{lcc}
+\multicolumn{1}{c}{\textbf{Transaction}} & \multicolumn{1}{l}{\textbf{Count}} & \multicolumn{1}{c}{\textbf{Total Cost on Ethereum (Polygon)}} \\ \hline
+Contract deployment                      & one time                           & 143.79 (0.33)          \\
+mint NFT                                 & one time                           & 12.05 (0.03)           \\
+update status                            & 2                                  & 9.26 (0.02)            \\
+approve status                           & 2                                  & 7.68 (0.02)            \\
+report violation                         & 3                                  & 8.91 (0.03)            \\ \hline
+\textbf{Total}                           & \textbf{9}                         & \textbf{181.69 (0.43)} \\
 \hline
 \end{tabular}
 \caption{Transaction fees field test}
 \label{tab:field_test_tx_fees}
 \end{table}
 
-The total cost of the field test mainly consists of the contract deployment. This transaction accounts for over 78\% of the total cost. The variable cost of the field test amount to 26.2 \gls{chf}.
 
 \subsection{Logger performance}
-The field test lasted around 52 minutes. During the transportation the logger stored every sensor reading in a local database. Figure \ref{fig:field_test_sensor_readings} illustrates the intervals of the sensor readings. Each line indicates a successful reading by the sensor, the red lines represent a violation. The maximum time between two readings was 9 minutes and 36 seconds. The shortest interval was less than a second.
+The field test lasted around 52 minutes. During the transportation, the logger stored every sensor reading in a local database. Figure \ref{fig:field_test_sensor_readings} illustrates the intervals of the sensor readings. Each line indicates a successful reading by the sensor, the red lines represent a violation. The maximum time between two readings was 9 minutes and 36 seconds. The shortest interval was less than a second.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{diagrams/sensor_eval.drawio.pdf}
     \caption{Timeline with sensor readings}
     \label{fig:field_test_sensor_readings}
 \end{figure}
 
-
 \section{Discussion}
 \label{sec:eval_discussion}
+The performance and cost of the developed system depend mainly on the blockchain used as infrastructure. The selection of such a blockchain thus is of significant importance and must be chosen with great diligence. The current prototype deployed on the sepolia testnet demonstrates the influence of different factors, such as network congestion and priority fees on the time needed for a transaction to be completed. On the testnet the average response time with a fixed gas price of 30 Gwei is reasonable and could support a real-life scenario. However, this is not representative of the mainnet.
+
+The gas consumption of the \gls{sc} functions however can be directly adopted to any blockchain running the same \gls{evm} version. The analysis shows that executing a simple scenario on the Ethereum network can be very costly. Polygon presents a solution to this issue as our estimation for the costs is reduced by a factor of over 422. On Ethereum, the total cost of a scenario is quite costly but considering the potential value of the artwork, we think it could be acceptable for a real-life scenario. With Polygon the estimated total cost is minimal and definitely acceptable.
+
+The security risks illustrated in Section \ref{sec:security_analysis} prevent the system to be used in a real-life artwork transportation scenario. The developed system serves as a proof of concept and the security vulnerabilities have to be mitigated for a production version of the system.
+
+The intervals of successful readings by the sensor have shown to be inconsistent and leave large gaps between readings. Unfortunately, the quality of the sensor would not be enough to support a real-life use case. A suitable sensor should be able to consistently record at shorter intervals preferably less than a minute long.
+

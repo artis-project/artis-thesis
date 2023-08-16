@@ -278,12 +278,12 @@ This will return the value from the \gls{sc} and can more or less be directly re
 
 \clearpage
 \section{artis-rockpi-logger}
-\begin{wrapfigure}[16]{O}{0.5\textwidth} %do not use wrapped figures
+\begin{figure}[h]
     \centering
     \includegraphics[width=0.49\textwidth]{resources/rock-pi.png}
     \caption{Rock Pi with a DHT-22 sensor} 
     \label{fig:rock-pi}
-\end{wrapfigure}
+\end{figure}
 Another major component of the system is the logging device used to monitor the environmental data during the transportation of the artwork. For this project, we used a Rock Pi \footnote{\href{https://rockpi.org/rockpi4}{https://rockpi.org/rockpi4}} with a DHT-22\footnote{\href{https://www.adafruit.com/product/385}{https://www.adafruit.com/product/385}} sensor attached. (Figure \ref{fig:rock-pi})
 
 The decision for this device and sensor is based on simplicity and flexibility as well as on low acquisition costs. The Rock Pi is compatible with the Linux operating systems which makes it very simple to write scripts using high-level programming languages like Python. It also has \gls{gpio} support to easily connect the DHT-22 sensor. The sensor is capable of recording temperature and humidity data from the environment.
