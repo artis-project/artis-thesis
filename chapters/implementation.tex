@@ -3,7 +3,7 @@
 This chapter highlights the implementational aspects of the system. Introducing the technologies used to build the components. Each section title refers to its respective GitHub repository of the \texttt{ARTIS-project}\footnote{\href{https://github.com/artis-project/}{https://github.com/artis-project/}} GitHub organization.
 
 \section{artis-smartcontract}
-The \gls{sc} was written in Ethereum's native programming language Solidity \cite{solidity}. The contract was developed using hardhat \cite{hardhat}, a development environment for Ethereum. Hardhat makes developing, compiling, testing, and deploying smart contracts easy. The \gls{sc} has been deployed to the Ethereum testnet Sepolia \cite{sepolia} during development, but is intended to be deployed on the mainnet in production. The Ethereum blockchain was selected due to the prior experience of the research group and the author.
+The \gls{sc} was written in Ethereum's native programming language Solidity \cite{solidity}. The contract was developed using hardhat \cite{hardhat}, a development environment for Ethereum. Hardhat makes developing, compiling, testing, and deploying smart contracts easy. The \gls{sc} has been deployed to the Ethereum testnet Sepolia \cite{sepolia} during development but is intended to be deployed on the mainnet in production. The Ethereum blockchain was selected due to the research group's and the author's prior experience.
 
 When the \gls{sc} is first deployed the \texttt{smartcontractAdmin} variable is set to the deploying address. This address will be the only point of access to any \gls{sc} function. It is also the account used by the server to interact with the \gls{sc} and sign transactions.
 
@@ -18,12 +18,12 @@ When the \gls{sc} is first deployed the \texttt{smartcontractAdmin} variable is 
 As seen in Listing \ref{lst:scconstructor} the \gls{sc} extends the ERC721 \cite{erc721} contract which provides the \gls{nft} interface.
 
 \subsection{Data Structures and Events}
-To understand the rest of the contract, we will explain the data structures used in more detail.
+We will explain the data structures used in more detail to understand the rest of the contract.
 
 \subsubsection{Structs}
 To satisfy the artwork tracking use case three additional structs have been defined as seen in Listing \ref{lst:scstructs}. The \texttt{ArtworkData} struct contains all information about a specific artwork. This includes the addresses of each actor as well as the violation timestamp and the status of the artwork. The status field in turn contains two fields as defined in the \texttt{Status} struct. They are used to support the multi-approval process when it comes to changing the status of an artwork. To match the physical artwork with the \gls{nft} we also included an objectID field. If needed, the \texttt{ArtworkData} struct can be extended with more data fields.
 
-The \texttt{StatusApprovals} struct is used to store which of the actors has already approved a status change. The logic behind this multi-approval process will be explained in detail later.
+The \texttt{StatusApprovals} struct stores which of the actors has already approved a status change. The logic behind this multi-approval process will be explained in detail later.
 
 \lstinputlisting[
     language=Solidity,
@@ -34,7 +34,7 @@ The \texttt{StatusApprovals} struct is used to store which of the actors has alr
 ]{codesnippets/smartcontract.sol}
 
 \subsubsection{Enums}
-The \gls{sc} defines one enum that is used to define the different status values that exist. Enums help during development as they prevent misspellings or other types of errors.
+The \gls{sc} defines one enum that defines the different status values that exist. Enums help during development as they prevent misspellings or other types of errors.
 
 \lstinputlisting[
     language=Solidity,
@@ -45,7 +45,7 @@ The \gls{sc} defines one enum that is used to define the different status values
 ]{codesnippets/smartcontract.sol}
 
 \subsubsection{Mappings}
-The \texttt{artworks} mapping is used to map artwork ids to \texttt{ArtworkData} structs. This mapping is used to store the references to each new artwork. Similarly, the \texttt{approvals} mapping is used to store and manage the approval data of an artwork. Put simply, this mapping can answer the question of who has approved a certain status of a specific artwork.
+The \texttt{artworks} mapping is used to map artwork ids to \texttt{ArtworkData} structs. This mapping is used to store the references to each new artwork. Similarly, the \texttt{approvals} mapping is used to store and manage the approval data of an artwork. Put, this mapping can answer the question of who has approved a certain status of a specific artwork.
 
 \lstinputlisting[
     language=Solidity,
@@ -69,7 +69,7 @@ The contract defines three events (Listing \ref{lst:scevents}). The \texttt{Upda
 ]{codesnippets/smartcontract.sol}
 
 \subsection{Functions and Modifiers}
-To support the functionality designed in Section \ref{sec:overview} the contract implements three main functions along with some modifiers and helper functions. However, we will not go into detail about the helper functions.
+To support the functionality designed in Section \ref{sec:overview} the contract implements three main functions, modifiers, and helper functions. However, we will not go into detail about the helper functions.
 
 \subsubsection{Function Modifiers}
 In Solidity, we can define function modifiers, that can be used to prepend functionality to a function. If a function modifier is used in a function the code in the modifier is executed beforehand. For instance, this can be used to perform a check before a function is run. Function modifiers can be reused on multiple functions and thus introduce cleaner and less redundant code.
@@ -142,7 +142,7 @@ The logic behind updating the status (Figure \ref{fig:update_status}) is more co
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[height=0.5\textheight, keepaspectratio]{diagrams/update_status.drawio.pdf}
+    \includegraphics[height=0.62\textheight, keepaspectratio]{diagrams/update_status.drawio.pdf}
     \caption{Multi-approval transportation status change}
     \label{fig:update_status}
 \end{figure}
@@ -268,7 +268,7 @@ To build the \gls{api} application we used Flask \cite{flask}. The entry point o
 The application layer connects to the \gls{sc} and submits the transactions needed to fulfill the \gls{api} request. To do this we are using the python web3 library \cite{web3python}. This functionality is defined in the \texttt{/src/smartcontract/ArtworkConnector.py} file. It defines a class that extends the \texttt{SmartContractConnector} abstract class. The \texttt{SmartContractConnector} class contains code that is generally necessary to connect to a \gls{sc}. This includes setting up the Web3 provider, as well as the account to submit the transactions, and adding some middleware. Additionally, we decided to define two \textit{abstractmethods} that fetch the contract address and contract \gls{abi} dynamically. This ensures that the \gls{api} is always connected to the newest contract. In our case, we used GitHub variables to store the contract address and the Etherscan \cite{etherscan} \gls{api} to query the \gls{abi}. With this setup, we built an extensible platform that can add endpoints to connect to additional \glspl{sc} more easily. 
 
 The \texttt{ArtworkConnector} class basically has the same interface as the solidity contract. As shown in Listing \ref{lst:artworkconnector}, each public method directly connects to a \gls{sc} method. Web3.py provides a simple-to-use smart contract proxy object which we stored in the class variable \texttt{self.\_contract}. This object makes all the contract functions available with the \texttt{functions} property. To call a contract function it suffices to execute \lstinline[language=Python]!self._contract.functions.<function_name>(<input>).call()!.
-This will return the value from the \gls{sc} and can more or less be directly returned to the user. If the function mutates the state of the contract we need to use \lstinline[language=Python]!.transact()! and a transaction hash is returned instead. We use this transaction hash to wait for the transaction receipt and extract the data from the emitted events. This is done by the helper function \texttt{self.\_handleEvent}.
+This will return the value from the \gls{sc} and can more or less be directly returned to the user. If the function mutates the state of the contract, we need to use \lstinline[language=Python]!.transact()! And a transaction hash is returned instead. We use this transaction hash to wait for the transaction receipt and extract the data from the emitted events. This is done by the helper function \texttt{self.\_handleEvent}.
 
 \lstinputlisting[
     language=Python,
@@ -284,13 +284,13 @@ This will return the value from the \gls{sc} and can more or less be directly re
     \caption{Rock Pi with a DHT-22 sensor} 
     \label{fig:rock-pi}
 \end{figure}
-Another major component of the system is the logging device used to monitor the environmental data during the transportation of the artwork. For this project, we used a Rock Pi \footnote{\href{https://rockpi.org/rockpi4}{https://rockpi.org/rockpi4}} with a DHT-22\footnote{\href{https://www.adafruit.com/product/385}{https://www.adafruit.com/product/385}} sensor attached. (Figure \ref{fig:rock-pi})
+Another major component of the system is the logging device used to monitor the environmental data during the transportation of the artwork. For this project, we used a Rock Pi \cite{rockpi4} with a DHT-22 \cite{dht22} sensor attached. (Figure \ref{fig:rock-pi})
 
-The decision for this device and sensor is based on simplicity and flexibility as well as on low acquisition costs. The Rock Pi is compatible with the Linux operating systems which makes it very simple to write scripts using high-level programming languages like Python. It also has \gls{gpio} support to easily connect the DHT-22 sensor. The sensor is capable of recording temperature and humidity data from the environment.
+The decision for this device and sensor is based on simplicity, flexibility, and low acquisition costs. The Rock Pi is compatible with the Linux operating system, making writing scripts using high-level programming languages like Python very simple. It also has \gls{gpio} support to connect the DHT-22 sensor easily. The sensor is capable of recording temperature and humidity data from the environment.
 
-To read data from the DHT-22 sensor we used an existing library called Rockfruit\_Python\_DHT\footnote{\href{https://github.com/Tim-J-Parbs/Rockfruit_Python_DHT}{https://github.com/Tim-J-Parbs/Rockfruit\_Python\_DHT}} that we adapted slightly to work with our board. The library provides a function with the signature \texttt{read\_retry(sensor, pin, retries=15, delay\_seconds=2)}. This method reads data from the DHT sensor of the specified type (in our case 22) on the specified \gls{gpio} pin and returns a tuple of humidity (as a floating point value in percent) and temperature (as a floating point value in Celsius). 
+To read data from the DHT-22 sensor, we used an existing library called "Rockfruit Python DHT" \cite{rockfruitpythondht} that we adapted slightly to work with our board. The library provides a function with the signature \texttt{read\_retry(sensor, pin, retries=15, delay\_seconds=2)}. This method reads data from the DHT sensor of the specified type (in our case 22) on the specified \gls{gpio} pin. It returns a tuple of humidity (as a floating point value in percent) and temperature (as a floating point value in Celsius). 
 
-The function will attempt to read multiple times (up to the specified retries) until a reading can be registered. If no reading can be registered after the amount of retries the function will return \texttt{(None, None)}. The default delay between retries is two seconds but can be overridden.
+The function will attempt to read multiple times (up to the specified retries) until a reading can be registered. If no reading can be registered after the amount of retries, the function will return \texttt{(None, None)}. The default delay between retries is two seconds but can be overridden.
 
 \begin{figure}[ht]
     \centering
@@ -306,7 +306,7 @@ The function will attempt to read multiple times (up to the specified retries) u
     label=lst:loggingscript
 ]{codesnippets/logging_script.py}
 
-In Listing \ref{lst:loggingscript}, you can see that the script is executing the \texttt{read\_retry} function in an endless loop, and whenever the reading has been successful it stores the data along with a timestamp of the reading in seconds and in a readable format in a local database.
+In Listing \ref{lst:loggingscript}, you can see that the script is executing the \texttt{read\_retry} function in an endless loop, and whenever the reading has been successful, it stores the data along with a timestamp of the reading in seconds and in a readable format in a local database.
 
 The logger contains a second important script which is run simultaneously. The \texttt{violation\_script.py} is executed with the predefined temperature and humidity thresholds and the corresponding artwork \gls{id}.
 
@@ -318,13 +318,13 @@ The logger contains a second important script which is run simultaneously. The \
     xrightmargin=2cm
 ]{codesnippets/violation_script.py}
 
-This script contains another while loop that continuously checks for new entries in the database and evaluates whether the threshold has been exceeded. If there has been either a temperature or humidity violation the script calls the corresponding method to call the \texttt{ARTIS} server \gls{api}. These methods are defined in the \texttt{artis\_api.py} file.
+This script contains another while loop that continuously checks for new entries in the database and evaluates whether the threshold has been exceeded. If there has been either a temperature or humidity violation, the script calls the corresponding method to call the \texttt{ARTIS} server \gls{api}. These methods are defined in the \texttt{artis\_api.py} file.
 
 To authenticate to the \gls{api}, the logger follows the same authentication flow illustrated in Figure \ref{fig:auth_flow}. The methods used to send the authentication requests and sign the challenge message are defined in the \texttt{authenticator.py} file.
 
 \clearpage
 \section{artis-frontend}
-The last component of the system is the user interface. It is a single-page application built with React \cite{react} and TypeScript. The styling is done with Tailwind CSS \cite{tailwindcss}. These technologies were selected due to the author's prior experience. Theoretically, the user interface is not required to interact with the system. However, simple authentication is a large benefit of the user interface. Its integration with Metamask \cite{metamask} enables a seamless login and authentication flow. From a code perspective thirdweb \cite{thirdweb} is used to access the \gls{api} of Metamask.
+The last component of the system is the user interface. It is a single-page application built with React \cite{react} and TypeScript. The styling is done with Tailwind CSS \cite{tailwindcss}. These technologies were selected due to the author's prior experience. Theoretically, the user interface is not required to interact with the system. However, simple authentication is a large benefit of the user interface. Its integration with Metamask \cite{metamask} enables a seamless login and authentication flow. From a code perspective, thirdweb \cite{thirdweb} is used to access the \gls{api} of Metamask.
 
 \begin{figure}[h]
     \centering
@@ -343,9 +343,9 @@ The last component of the system is the user interface. It is a single-page appl
     \end{subfigure}
 \end{figure}
 
-An unauthenticated user first lands on this welcome page with a button to connect the website to Metamask as shown in Figure \ref{fig:welcome_screen}. After pressing the button, Metamask opens a pop-up to select an account to connect to the website (Figure \ref{fig:connecting_metamask}). Finally, the button label changes to "Sign in" and as soon as the user presses the button again, a signature request is sent to the server. The message that is visible on the pop-up in Figure \ref{fig:sign_in} is a message constructed from the response of the POST \texttt{/auth/payload} request.
+An unauthenticated user first lands on this welcome page with a button to connect the website to Metamask as shown in Figure \ref{fig:welcome_screen}. After pressing the button, Metamask opens a pop-up to select an account to connect to the website (Figure \ref{fig:connecting_metamask}). Finally, the button label changes to "Sign in" and as soon as the user presses the button again, a signature request is sent to the server. The message visible on the pop-up in Figure \ref{fig:sign_in} is a message constructed from the response of the POST \texttt{/auth/payload} request.
 
-Once the user signs this message the signature is sent back to the server, validated and an authentication token is issued. The user is now logged in and is able to see all the artworks by their \glspl{id} that are associated with the logged-in account (Figure \ref{fig:artworks_page}).
+Once the user signs this message, the signature is sent back to the server, validated, and an authentication token is issued. The user is now logged in and can see all the artworks by their \glspl{id} that are associated with the logged-in account (Figure \ref{fig:artworks_page}).
 
 \begin{figure}[h!]
     \ContinuedFloat
@@ -371,7 +371,7 @@ Once the user signs this message the signature is sent back to the server, valid
     \label{fig:sign_in_process}
 \end{figure}
 
-The artwork page shows a colorful tile representing an artwork. Each tile is labeled with the corresponding artwork \gls{id}. The tabs on the top can be selected to view all the artworks where the account is registered \textit{e.g.} the user might be the owner of artwork $1$ but the recipient of artwork $2$. 
+The artwork page shows a colorful tile representing an artwork. Each tile is labeled with the corresponding artwork \gls{id}. The tabs on the top can be selected to view all the artworks where the account is registered \textit{e.g.} the user might be the artwork owner $1$ but the recipient $2$. 
 
 \begin{figure}
     \centering
@@ -389,5 +389,5 @@ The artwork page shows a colorful tile representing an artwork. Each tile is lab
     \end{minipage}
 \end{figure}
 
-To create a new artwork \gls{nft}, the user can click on the transparent tile at the bottom. This will open up a modal where the user can enter details about the artwork (Figure \ref{fig:mint_modal}). To view more details about an existing artwork the user can click on a tile to open up the detail view shown in Figure \ref{fig:artwork_detail}. This view displays important information like the status of the artwork, the role the user is registered as, and the timestamp of the most recent violation if any occurred. Further, the user can edit values by switching on the edit mode with the switch on the top right.  
+To create a new artwork \gls{nft}, the user can click on the transparent tile at the bottom. This will open up a modal where the user can enter details about the artwork (Figure \ref{fig:mint_modal}). To view more details about an existing artwork the user can click on a tile to open up the detail view shown in Figure \ref{fig:artwork_detail}. This view displays important information like the status of the artwork, the role the user is registered as, and the timestamp of the most recent violation, if any occurred. Further, the user can edit values by switching on the edit mode with the switch on the top right.  
 
