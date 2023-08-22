@@ -8,7 +8,7 @@ The primary cost factor of the artis-system is the \gls{sc}. Each execution of a
 $$
 transaction\ fee = gas \times gas\ price
 $$
-To analyze the execution costs of the \textit{safeMint} and \textit{updateArtworkData} contract functions, we executed the corresponding requests of the developed \gls{api} multiple times $(n = 10)$ for each input variety. This analysis was conducted on the sepolia testnet and the resulting transactions was inspected on the Etherscan block explorer. The transactions were submitted with a relatively high gas price (30 Gwei) to make the transactions attractive for validators \cite{ethergas}. During this analysis, we observed that the gas used for a specific function depends on the input parameters but does not vary if the input parameters are the same. To analyze the performance, we also recorded the processing time of each request. This time can be an indicator of the performance but depends on the state of the blockchain and likely differs on the mainnet.
+To analyze the execution costs of the \textit{safeMint} and \textit{updateArtworkData} contract functions, we executed the corresponding requests of the developed \gls{api} multiple times $(n = 10)$ for each input variety. This analysis was conducted on the sepolia testnet and the resulting transactions were inspected on the Etherscan block explorer. The transactions were submitted with a relatively high gas price (30 Gwei) to make the transactions attractive for validators \cite{ethergas}. During this analysis, we observed that the gas used for a specific function depends on the input parameters but does not vary if the input parameters are the same. To analyze the performance, we also recorded the processing time of each request. This time can be an indicator of the performance but depends on the state of the blockchain and likely differs on the mainnet.
 
 To get a sense of how gas translates into fees, we used the average gas price of the past month for the Ethereum mainnet (28 Gwei, 07.08.23 - 08.08.23) \cite{gaspriceaverageethereum} and the current value of Ether in \gls{chf} (1625.20 CHF = 1 ETH, 09.08.23) \cite{coinmarketcap}. Because the contract can also be deployed on other blockchains that use the \gls{evm}, we decided to include the cost on the polygon network. Except the contract has not been deployed to the Polygon network, and the same amount of gas was used for these calculations. The average gas price of the past month (173 Gwei \cite{gaspriceaveragepolygon}, 07.08.23 - 08.08.23) was multiplied by the gas and converted into \gls{chf} by using the current price for MATIC (0.60 CHF = 1 MATIC, 09.08.23) \cite{coinmarketcap}. The results were rounded to four decimal points for the tokens and two decimal points for \gls{chf}.
 
@@ -89,7 +89,7 @@ The GET endpoints exposed by the \gls{api} target several functions that do not 
 Since the system is intended to be used by different actors in a trust-less environment a security analysis is vital for evaluating the prototype. The following section discusses the different attack surfaces and evaluates the security risk.
 
 \subsection{Threat Scenarios}
-% You can improve the analysis here considering those aspects in terms of CIA (Confidentiality, Integrity, and Availability). 
+% You can improve the analysis here by considering those aspects in terms of CIA (Confidentiality, Integrity, and Availability). 
 % Even a small table with risk assessment 
 \subsubsection{Compromised Logger}
 The logging device is important to the system, and a compromised device would lead to a compromised system altogether. We consider three different attack scenarios when it comes to the logger.
@@ -101,10 +101,10 @@ The recordings can also be influenced externally by exploiting the hardware comp
 The system only allows registered actors to change the \gls{nft}. This is also true for the logger device, which authenticates the system by signing a challenge message with a private key. If the private key is leaked, a malicious actor could report violations even if none occurred. Currently, the private key is stored in an environment variable on the software. An attacker could easily retrieve the value of the private key by connecting to the logger. This indicates a high-security risk for this threat.
 
 \subsection{Compromised Smart Contract}
-A malicious actor could influence the state of the \gls{sc} by accessing it directly. The attacker would have to identify flaws in the contract code and find an exploit to manipulate artwork data. We estimate the security risk of finding a flaw in the code to be medium, as the contract was tested during development, and basic code-checking tools could not identify a vulnerability. The \gls{sc} only accepts transactions issued by the system's admin. If the admin credentials are leaked, the attacker would have unlimited access to the \gls{sc}. In the current system, the admin's private key is only stored on the artis-server. The server is deployed as a Google Cloud run service, and the Google secret manager supplies the private key. The security risk for this threat scenario is estimated to be low because the secret manager is an industry-standard solution for managing sensitive data.
+A malicious actor could influence the state of the \gls{sc} by accessing it directly. The attacker would have to identify flaws in the contract code and find an exploit to manipulate artwork data. We estimate the security risk of finding a flaw in the code to be medium, as the contract was tested during development, and basic code-checking tools could not identify a vulnerability. The \gls{sc} only accepts transactions issued by the system's admin. If the admin credentials are leaked, the attacker would have unlimited access to the \gls{sc}. In the current system, the admin's private key is only stored on the artis-server. The server is deployed as a Google Cloud-run service, and the Google secret manager supplies the private key. The security risk for this threat scenario is estimated to be low because the secret manager is an industry-standard solution for managing sensitive data.
 
 \subsection{Disclosure of Data}
-The data stored on the \gls{sc} could be sensitive depending on the use case. The \gls{sc} prevents unauthorized users from reading data. However, the transactions submitted to update data can contain sensitive information. This information can be read by anyone that has access to the \gls{sc} address, admin address, or any of the actors' addresses. Because these addresses are not considered secrets, the system must disclose all data to the public. This could introduce a high security risk for certain use cases.
+The data stored on the \gls{sc} could be sensitive depending on the use case. The \gls{sc} prevents unauthorized users from reading data. However, the transactions submitted to update data can contain sensitive information. This information can be read by anyone that has access to the \gls{sc} address, admin address, or any of the actors' addresses. Because these addresses are not considered secrets, the system must disclose all data to the public. This could introduce a high-security risk for certain use cases.
 
 \section{Field Test}
 \label{sec:field_test}
@@ -171,9 +171,8 @@ report violation                         & 3                                  & 
 \label{tab:field_test_tx_fees}
 \end{table}
 
-
-\subsection{Logger performance}
-The field test lasted around 52 minutes. During the transportation, the logger stored every sensor reading in a local database. Figure \ref{fig:field_test_sensor_readings} illustrates the intervals of the sensor readings. Each line indicates a successful reading by the sensor; the red lines represent a violation. The maximum time between two readings was 9 minutes and 36 seconds. The shortest interval was less than a second.
+\subsection{Logger Reliability}
+The field test lasted around 52 minutes. During the transportation, the logger stored every sensor reading in a local database. Figure \ref{fig:field_test_sensor_readings} illustrates the intervals of the sensor readings. Each line indicates a successful reading by the sensor; the red lines represent a violation. The maximum time between two readings was 9 minutes and 36 seconds. The shortest interval was less than a second. For this prototype, we did not test other metrics such as accuracy or range.
 
 \begin{figure}[ht]
     \centering
@@ -182,16 +181,14 @@ The field test lasted around 52 minutes. During the transportation, the logger s
     \label{fig:field_test_sensor_readings}
 \end{figure}
 
-%\subsection{Logger reliability}
-% paragraph
 
 \section{Discussion}
 \label{sec:eval_discussion}
-The performance and cost of the developed system depend mainly on the blockchain used as infrastructure. The selection of such a blockchain thus is of significant importance and must be chosen with great diligence. The current prototype deployed on the sepolia testnet demonstrates the influence of different factors, such as network congestion and priority fees on the time needed for a transaction to be completed. On the testnet the average response time with a fixed gas price of 30 Gwei is reasonable and could support a real-life scenario. However, this is not representative of the mainnet.
+The performance and cost of the developed system depend mainly on the blockchain used as infrastructure. The selection of such a blockchain thus is of significant importance and must be chosen with great diligence. The current prototype deployed on the sepolia testnet demonstrates the influence of different factors, such as network congestion and priority fees on the time needed for a transaction to be completed. On the testnet, the average response time with a fixed gas price of 30 Gwei is reasonable and could support a real-life scenario. However, this is not representative of the mainnet.
 
 However, the gas consumption of the \gls{sc} functions can be directly adopted to any blockchain running the same \gls{evm} version. The analysis shows that executing a simple scenario on the Ethereum network can be very costly. Polygon presents a solution to this issue as our cost estimation is reduced by a factor of over 422. On Ethereum, the total cost of a scenario is quite costly, but considering the artwork's potential value, we think it could be acceptable for a real-life scenario. With Polygon, the estimated total cost is minimal and acceptable.
 
 The security risks illustrated in Section \ref{sec:security_analysis} prevent the system from being used in a real-life artwork transportation scenario. The developed system serves as a proof of concept, and the security vulnerabilities must be mitigated for a production version.
 
-The intervals of successful readings by the sensor have shown to be inconsistent and leave large gaps between readings. Unfortunately, the quality of the sensor would not be enough to support a real-life use case. A suitable sensor should be able to consistently record at shorter intervals preferably less than a minute long. The reason sensors poor performance is unclear. Possible explanations include a timing issue in the communication between the board and the sensor, voltage fluctuations as the board was powered by a portable power bank, or other environmental factors. We believe that this issue could easily be solved by using a higher quality board with integrated sensors such as the B-L462E-CELL1 Discovery kit by ST \cite{stmdevice}. 
+The intervals of successful readings by the sensor have shown to be inconsistent and leave large gaps between readings. Unfortunately, the quality of the sensor would not be enough to support a real-life use case. A suitable sensor should be able to consistently record at shorter intervals preferably less than a minute long. The reason for the sensor's poor performance is unclear. Possible explanations include a timing issue in the communication between the board and the sensor, voltage fluctuations as the board was powered by a portable power bank or other environmental factors. We believe that this issue could easily be solved by using a higher quality board with integrated sensors such as the B-L462E-CELL1 Discovery kit by ST \cite{stmdevice}. 
 

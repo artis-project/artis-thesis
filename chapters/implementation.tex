@@ -45,7 +45,7 @@ The \gls{sc} defines one enum that defines the different status values that exis
 ]{codesnippets/smartcontract.sol}
 
 \subsubsection{Mappings}
-The \texttt{artworks} mapping is used to map artwork ids to \texttt{ArtworkData} structs. This mapping is used to store the references to each new artwork. Similarly, the \texttt{approvals} mapping is used to store and manage the approval data of an artwork. Put, this mapping can answer the question of who has approved a certain status of a specific artwork.
+The \texttt{artworks} mapping is used to map artwork ids to \texttt{ArtworkData} structs. This mapping is used to store the references to each new artwork. Similarly, the \texttt{approvals} mapping is used to store and manage the approval data of an artwork. Simply put, this mapping can answer the question of who has approved a certain status of a specific artwork.
 
 \lstinputlisting[
     language=Solidity,
@@ -58,7 +58,7 @@ The \texttt{artworks} mapping is used to map artwork ids to \texttt{ArtworkData}
 \textit{e.g.} \texttt{approvals[1][StatusValue.IN\_TRANSIT].carrier} is \texttt{true} if and only if the carrier has already approved to change the artwork status of artwork $1$ to IN\_TRANSIT.
 
 \subsubsection{Events}
-The contract defines three events (Listing \ref{lst:scevents}). The \texttt{Updated} event is emitted whenever the data associated with an artwork has changed. The \texttt{StatusApproved} event is emitted whenever the multi-approval process (Figure \ref{fig:update_status}) has been successful. If an approval is still missing the \texttt{ApprovalMissing} event is emitted. Users are able to subscribe to these events and be notified whenever an event is emitted.
+The contract defines three events (Listing \ref{lst:scevents}). The \texttt{Updated} event is emitted whenever the data associated with an artwork has changed. The \texttt{StatusApproved} event is emitted whenever the multi-approval process (Figure \ref{fig:update_status}) has been successful. If an approval is still missing the \texttt{ApprovalMissing} event is emitted. Users can subscribe to these events and be notified whenever an event is emitted.
 
 \lstinputlisting[
     language=Solidity,
@@ -86,11 +86,11 @@ The modifiers in Listing \ref{lst:scmodifiers} are used to check if a caller is 
 
 To ensure that all \gls{sc} interaction is done through the server \gls{api} we modified every public function with the \texttt{onlyAdmin} modifier. This modifier reverts any transaction which is sent from a different account than the specified admin account.
 
-The \texttt{read} modifier is additionally added to each function that reads data from the \gls{sc}. There we check that the wallet that authenticated a request to the server \gls{api} is registered as an actor with read permissions.
+The \texttt{read} modifier is additionally added to each function that reads data from the \gls{sc}. We check that the wallet that authenticated a request to the server \gls{api} is registered as an actor with read permissions.
 
 Similarly, we defined the \texttt{write} modifier to check that certain \texttt{ArtworkData} fields are only modified by the owner or logger respectively. The \texttt{currentStatus} field cannot be modified at all, it is updated automatically once the actors approved a status change. The detailed permission sets of each actor can be found in Table \ref{tab:permission_sets}
 
-The contract makes use of one additional modifier called \texttt{exists} which simply checks if a given tokenId actually exists.
+The contract makes use of one additional modifier called \texttt{exists} which simply checks if a given tokenId exists.
 
 \subsubsection{safeMint}
 This function is called to create a new \gls{nft}. This process is called "minting". The safeMint function in an ERC721 contract creates and assigns ownership of a new \gls{nft} to a designated recipient. 
@@ -138,7 +138,7 @@ This works identically for updating the roles and the objectID. When updating th
 
 \paragraph{Updating the transportation status}
 \label{sec:update_status}
-The logic behind updating the status (Figure \ref{fig:update_status}) is more complex. The reason for this is the multi-approval feature of this contract. To satisfy our use case, the actors must agree on the transportation status of the artwork. To ensure this agreement, each affected actor must submit an update request with the same value. Only if this requirement is satisfied, the binding transportation status is updated. 
+The logic behind updating the status (Figure \ref{fig:update_status}) is more complex. The reason for this is the multi-approval feature of this contract. To satisfy our use case, the actors must agree on the transportation status of the artwork. To ensure this agreement, each affected actor must submit an update request with the same value. Only if this requirement is satisfied, is the binding transportation status updated. 
 
 \begin{figure}[ht]
     \centering
@@ -147,11 +147,11 @@ The logic behind updating the status (Figure \ref{fig:update_status}) is more co
     \label{fig:update_status}
 \end{figure}
 
-To differentiate between the status that actors want to change to and the status which is currently in place we introduced two variables: \texttt{requestedStatus} and \texttt{currentStatus}. Users can request a status change by submitting a new \texttt{requestedStatus}. If this value does not match the previous value, all approvals are reset, and the \texttt{requestedStatus} field is set to the new value. The next step is to set the approval for the actor who sent the initial update request. Because different actors must approve different status changes, we need to check for the three distinct cases.
+To differentiate between the status that actors want to change to and the status which is currently in place we introduced two variables: \texttt{requestedStatus} and \texttt{currentStatus}. Users can request a status change by submitting a new \texttt{requestedStatus}. If this value does not match the previous value, all approvals are reset, and the \texttt{requestedStatus} field is set to the new value. The next step is to set the approval for the actor who sent the initial update request. Because different actors must approve different status changes, we must check for the three distinct cases.
 
-If the status is requested to change from TO\_BE\_DELIVERED to IN\_TRANSIT, the carrier and the owner must approve that change. This check is performed analogously for the change from IN\_TRANSIT to DELIVERED. Lastly, the owner makes the decision to change from DELIVERED to TO\_BE\_DELIVERED. Any other combination of status changes is not allowed, and the transaction will be reverted.
+If the status is requested to change from TO\_BE\_DELIVERED to IN\_TRANSIT, the carrier, and the owner must approve that change. This check is performed analogously for the change from IN\_TRANSIT to DELIVERED. Lastly, the owner decides to change from DELIVERED to TO\_BE\_DELIVERED. Any other combination of status changes is not allowed, and the transaction will be reverted.
 
-If the right approvals have already been made, the function will automatically update the \texttt{currentStatus} and terminate. If any approval is missing, it will terminate without updating the \texttt{currentStatus}. In that case, the actor in question must submit their own request for a status update.
+If the right approvals have already been made, the function will automatically update the \texttt{currentStatus} and terminate. If any approval is missing, it will terminate without updating the \texttt{currentStatus}. In that case, the actor in question must submit their request for a status update.
 
 \subsubsection{getArtworkData}
 The function to retrieve data about an artwork is the simplest one. It merely returns the \texttt{ArtworkData} object mapped to the requested artwork \gls{id}. To easily convert the returned tuple to an object using the contract \gls{abi}, each property is mapped to the tuple entry specified in the function signature, visible in Listing \ref{lst:scget}.
@@ -265,10 +265,10 @@ To build the \gls{api} application we used Flask \cite{flask}. The entry point o
 
 
 \subsection{Application Layer}
-The application layer connects to the \gls{sc} and submits the transactions needed to fulfill the \gls{api} request. To do this we are using the python web3 library \cite{web3python}. This functionality is defined in the \texttt{/src/smartcontract/ArtworkConnector.py} file. It defines a class that extends the \texttt{SmartContractConnector} abstract class. The \texttt{SmartContractConnector} class contains code that is generally necessary to connect to a \gls{sc}. This includes setting up the Web3 provider, as well as the account to submit the transactions, and adding some middleware. Additionally, we decided to define two \textit{abstractmethods} that fetch the contract address and contract \gls{abi} dynamically. This ensures that the \gls{api} is always connected to the newest contract. In our case, we used GitHub variables to store the contract address and the Etherscan \cite{etherscan} \gls{api} to query the \gls{abi}. With this setup, we built an extensible platform that can add endpoints to connect to additional \glspl{sc} more easily. 
+The application layer connects to the \gls{sc} and submits the transactions needed to fulfill the \gls{api} request. To do this we are using the python web3 library \cite{web3python}. This functionality is defined in the \texttt{/src/smartcontract/ArtworkConnector.py} file. It defines a class that extends the \texttt{SmartContractConnector} abstract class. The \texttt{SmartContractConnector} class contains code that is generally necessary to connect to a \gls{sc}. This includes setting up the Web3 provider, as well as the account to submit the transactions, and adding some middleware. Additionally, we decided to define two \textit{abstractmethods} that fetch the contract address and contract \gls{abi} dynamically. This ensures the \gls{api} is always connected to the newest contract. In our case, we used GitHub variables to store the contract address and the Etherscan \cite{etherscan} \gls{api} to query the \gls{abi}. With this setup, we built an extensible platform that can add endpoints to connect to additional \glspl{sc} more easily. 
 
-The \texttt{ArtworkConnector} class basically has the same interface as the solidity contract. As shown in Listing \ref{lst:artworkconnector}, each public method directly connects to a \gls{sc} method. Web3.py provides a simple-to-use smart contract proxy object which we stored in the class variable \texttt{self.\_contract}. This object makes all the contract functions available with the \texttt{functions} property. To call a contract function it suffices to execute \lstinline[language=Python]!self._contract.functions.<function_name>(<input>).call()!.
-This will return the value from the \gls{sc} and can more or less be directly returned to the user. If the function mutates the state of the contract, we need to use \lstinline[language=Python]!.transact()! And a transaction hash is returned instead. We use this transaction hash to wait for the transaction receipt and extract the data from the emitted events. This is done by the helper function \texttt{self.\_handleEvent}.
+The \texttt{ArtworkConnector} class has the same interface as the solidity contract. As shown in Listing \ref{lst:artworkconnector}, each public method directly connects to a \gls{sc} method. Web3.py provides a simple-to-use smart contract proxy object which we stored in the class variable \texttt{self.\_contract}. This object makes all the contract functions available with the \texttt{functions} property. To call a contract function it suffices to execute \lstinline[language=Python]!self._contract.functions.<function_name>(<input>).call()!.
+This will return the value from the \gls{sc} and can more or less be directly returned to the user. If the function mutates the state of the contract, we need to use \lstinline[language=Python]!.transact()! and a transaction hash is returned instead. We use this transaction hash to wait for the transaction receipt and extract the data from the emitted events. This is done by the helper function \texttt{self.\_handleEvent}.
 
 \lstinputlisting[
     language=Python,
@@ -290,7 +290,7 @@ The decision for this device and sensor is based on simplicity, flexibility, and
 
 To read data from the DHT-22 sensor, we used an existing library called "Rockfruit Python DHT" \cite{rockfruitpythondht} that we adapted slightly to work with our board. The library provides a function with the signature \texttt{read\_retry(sensor, pin, retries=15, delay\_seconds=2)}. This method reads data from the DHT sensor of the specified type (in our case 22) on the specified \gls{gpio} pin. It returns a tuple of humidity (as a floating point value in percent) and temperature (as a floating point value in Celsius). 
 
-The function will attempt to read multiple times (up to the specified retries) until a reading can be registered. If no reading can be registered after the amount of retries, the function will return \texttt{(None, None)}. The default delay between retries is two seconds but can be overridden.
+The function will attempt to read multiple times (up to the specified retries) until a reading can be registered. If no reading can be registered after the number of retries, the function will return \texttt{(None, None)}. The default delay between retries is two seconds but can be overridden.
 
 \begin{figure}[ht]
     \centering
@@ -306,7 +306,7 @@ The function will attempt to read multiple times (up to the specified retries) u
     label=lst:loggingscript
 ]{codesnippets/logging_script.py}
 
-In Listing \ref{lst:loggingscript}, you can see that the script is executing the \texttt{read\_retry} function in an endless loop, and whenever the reading has been successful, it stores the data along with a timestamp of the reading in seconds and in a readable format in a local database.
+In Listing \ref{lst:loggingscript}, you can see that the script is executing the \texttt{read\_retry} function in an endless loop, and whenever the reading has been successful, it stores the data along with a timestamp of the reading in seconds and a readable format in a local database.
 
 The logger contains a second important script which is run simultaneously. The \texttt{violation\_script.py} is executed with the predefined temperature and humidity thresholds and the corresponding artwork \gls{id}.
 
@@ -389,5 +389,5 @@ The artwork page shows a colorful tile representing an artwork. Each tile is lab
     \end{minipage}
 \end{figure}
 
-To create a new artwork \gls{nft}, the user can click on the transparent tile at the bottom. This will open up a modal where the user can enter details about the artwork (Figure \ref{fig:mint_modal}). To view more details about an existing artwork the user can click on a tile to open up the detail view shown in Figure \ref{fig:artwork_detail}. This view displays important information like the status of the artwork, the role the user is registered as, and the timestamp of the most recent violation, if any occurred. Further, the user can edit values by switching on the edit mode with the switch on the top right.  
+To create a new artwork \gls{nft}, the user can click on the transparent tile at the bottom. This will open up a modal where the user can enter details about the artwork (Figure \ref{fig:mint_modal}). To view more details about an existing artwork the user can click on a tile to open up the detail view shown in Figure \ref{fig:artwork_detail}. This view displays important information like the status of the artwork, the role the user is registered as, and the timestamp of the most recent violation if any occurred. Further, the user can edit values by switching on the edit mode with the switch on the top right.  
 
