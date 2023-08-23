@@ -184,7 +184,8 @@ To implement the authentication flow described in section \ref{sec:authenticatio
     caption=Generating the challenge payload,
     label=lst:authpayload,
     firstline=1,
-    lastline=15
+    lastline=15,
+    float
 ]{codesnippets/authenticator.py}
 
 The method described in Listing \ref{lst:authpayload} constructs a dictionary with the information used to build the challenge message. The method is exposed by the \gls{api} layer via the \texttt{/auth/payload} endpoint as listed in Table \ref{tab:authentication_endpoints}. This dictionary is then returned to the client who constructs a message from it and signs it.
@@ -252,7 +253,8 @@ A GET request to \texttt{/artworks} will return the artwork IDs where the reques
     caption=GET \texttt{/artworks} response,
     label=lst:getall,
     firstline=19,
-    lastline=24
+    lastline=24,
+    float
 ]{codesnippets/artwork.json}
 
 To build the \gls{api} application we used Flask \cite{flask}. The entry point of the Flask application is the \texttt{app.py} file in the base folder. The endpoint definitions of the \texttt{/artworks} route are shown in Listing \ref{lst:flaskapp}. The logic in the entry methods is reduced to a minimum. The body is validated and loaded to the internal \texttt{Artwork} class. Then the request is processed by the application layer and returned after being converted back to a \gls{json} object.
@@ -303,7 +305,8 @@ The function will attempt to read multiple times (up to the specified retries) u
 \lstinputlisting[
     language=Python,
     caption=Temperature and humidity logging loop in \texttt{logging\_script.py},
-    label=lst:loggingscript
+    label=lst:loggingscript,
+    float
 ]{codesnippets/logging_script.py}
 
 In Listing \ref{lst:loggingscript}, you can see that the script is executing the \texttt{read\_retry} function in an endless loop, and whenever the reading has been successful, it stores the data along with a timestamp of the reading in seconds and a readable format in a local database.

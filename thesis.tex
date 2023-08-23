@@ -21,6 +21,7 @@
 \usepackage{rotating}
 \usepackage{graphics, graphicx}
 \usepackage{listings}
+\input{custom-highlighting}
 \usepackage{xcolor}
 \usepackage{fancybox}
 \usepackage{picinpar,varioref,floatflt}
@@ -32,12 +33,15 @@
 \usepackage{url}
 \usepackage{tabularray}
 \usepackage{unizhdt}
+%%% Abbreviations and Glossary configurations %%%
 \usepackage[abbreviations, nonumberlist, shortcuts, automake, nogroupskip]{glossaries-extra}
 \usepackage{forest}
 \makeglossaries
 \input{abbreviations.tex}
 \input{glossary.tex}
+%%%
 
+%%% Bibliography configurations %%%
 \usepackage[
     backend=biber,
     style=numeric,
@@ -48,7 +52,12 @@
     doi=true,
     ]{biblatex}
 \addbibresource{references.bib}
-
+% removes In: in the bibliography
+\renewbibmacro{in:}{}
+% allows for line breaks in the bibliography
+\setcounter{biburllcpenalty}{7000}
+\setcounter{biburlucpenalty}{8000}
+% custom bibliography driver for websites
 \DeclareBibliographyDriver{misc}{%
     \printnames{author}%
     \newunit%
@@ -61,8 +70,7 @@
     \printfield{booktitle}% used to display last-accessed for websites due to a limitation of mendeley api
     \finentry
 }
-
-\input{custom-highlighting}
+%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -124,7 +132,8 @@
 
 \input{chapters/summary.tex}
 
-\input{bibliography.tex}
+\printbibliography
+\addcontentsline{toc}{chapter}{Bibliography}
 
 % Abbreviations
 \setglossarystyle{super}
