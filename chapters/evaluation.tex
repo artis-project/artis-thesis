@@ -170,7 +170,7 @@ report violation                         & 3                                  & 
 \caption{Transaction fees field test}
 \label{tab:field_test_tx_fees}
 \end{table}
-
+\vspace{-0.5cm}
 \subsection{Logger Reliability}
 The field test lasted around 52 minutes. During the transportation, the logger stored every sensor reading in a local database. Figure \ref{fig:field_test_sensor_readings} illustrates the intervals of the sensor readings. Each line indicates a successful reading by the sensor; the red lines represent a violation. The maximum time between two readings was 9 minutes and 36 seconds. The shortest interval was less than a second. For this prototype, we did not test other metrics such as accuracy or range.
 
@@ -186,7 +186,7 @@ The field test lasted around 52 minutes. During the transportation, the logger s
 \label{sec:eval_discussion}
 The performance and cost of the developed system depend mainly on the blockchain used as infrastructure. The selection of such a blockchain thus is of significant importance and must be chosen with great diligence. The current prototype deployed on the sepolia testnet demonstrates the influence of different factors, such as network congestion and priority fees on the time needed for a transaction to be completed. On the testnet, the average response time with a fixed gas price of 30 Gwei is reasonable and could support a real-life scenario. However, this is not representative of the mainnet.
 
-However, the gas consumption of the \gls{sc} functions can be directly adopted to any blockchain running the same \gls{evm} version. The analysis shows that executing a simple scenario on the Ethereum network can be very costly. Polygon presents a solution to this issue as our cost estimation is reduced by a factor of over 422. On Ethereum, the total cost of a scenario is quite costly, but considering the artwork's potential value, we think it could be acceptable for a real-life scenario. With Polygon, the estimated total cost is minimal and acceptable.
+However, the gas consumption of the \gls{sc} functions can be directly adapted to any block-chain running the same \gls{evm} version. The analysis shows that executing a simple scenario on the Ethereum network can be very costly. Polygon presents a solution to this issue as our cost estimation is reduced by a factor of over 422. On Ethereum, the total cost of a scenario is quite costly, but considering the artwork's potential value, we think it could be acceptable for a real-life scenario. With Polygon, the estimated total cost is minimal and acceptable.
 
 The security risks illustrated in Section \ref{sec:security_analysis} prevent the system from being used in a real-life artwork transportation scenario. The developed system serves as a proof of concept, and the security vulnerabilities must be mitigated for a production version.
 

@@ -1,6 +1,6 @@
 \chapter{Related Work}
 \label{chap:related_work}
-This chapter provides an overview of the existing literature on art tracking with IoT and blockchains, highlighting previous research, methods, and findings related to the research question. Lastly, we also provide an overview of this field's state of the art.
+This chapter provides an overview of the existing literature on art tracking with IoT and blockchains, highlighting previous research, methods, and findings related to the research question. Lastly, we also provide a discussion of the reviewed literature and conclude the chapter by identifying any research gaps.
 
 \section{Artwork Conservation}
 When it comes to preserving artworks, several factors play a role. This includes their exposition to human factors as well as environmental variations \cite{woodenartworkmonitoring}. More specifically factors that can hamper artwork integrity include humidity, temperature, light, pollutants, and microbiological organisms \cite{riskassessment}. Usually, temperature and humidity are the most sensitive parameters \cite{riskassessment}. The monitoring of such factors can be of significant importance when it comes to artwork preservation and health \cite{environmentmonitoring}. In addition to the conservation of artworks in museums or galleries, there is also the aspect of ensuring the safety of artwork during transportation. 
@@ -25,15 +25,11 @@ Platforms such as \textcite{artory}, \textcite{4art}, and \textcite{verisart} ha
 
 \textcite{artchain}, for example, developed a blockchain-based trading system for artworks that uses \glspl{nft} to represent physical artworks. Introducing traceability, irreversibility, and transparency into the art market. 
 
-\textcite{artory}, is a company employing these concepts to tokenize physical artworks to create a secure record of art pieces' provenance and ownership.
-
-
 In this regard, \textcite{nftminter} has proposed an advanced \gls{nft} Minter for a blockchain-based artwork trading system. 
 
 \textcite{artrentalblockchain} developed an artwork rental system based on blockchain technology to facilitate lending artwork collections.
 
-
-\section{Supply Chain Management}
+\section{Applications of Blockchain and IoT}
 \gls{scm} is another area where \gls{iot} is being used to improve processes. Similar to monitoring the environment around an artwork, \gls{iot} is being used in \gls{scm} to monitor the product state in order to ensure the right quality \cite{iotsupplychains}. Another technology that is innovating \gls{scm} is the use of blockchain. The combination of these two technologies in industrial systems and supply chains has been a "hot trend" in recent years \cite{industryiot}. Blockchain presents an opportunity to build a trust basis with its unique characteristic of immutability. This can be used to improve documentation and traceability of physical assets as well as ensure the authenticity of the asset as well as collected data. The work that follows has already been established in this context.
 
 \textcite{modum.io} present a solution to monitor relevant environmental data while transporting medical products. Upon delivery, the collected data is checked for compliance by a smart contract and then stored on the blockchain. There the data is immutable and verifiable by any party. The proposed system comprises backend, frontend, and \gls{iot} sensor devices. The architecture and components of the system are shown in Figure \ref{fig:modum.io}. In addition to the Ethereum blockchain network, modum.io uses a relational database to store raw temperature data and user credentials. The mobile clients download the temperature data via Bluetooth from the sensors and submit it to the server, which sends it to the \gls{sc} to evaluate the regulatory compliance and store the result \gls{on-chain}.
@@ -54,6 +50,13 @@ In this regard, \textcite{nftminter} has proposed an advanced \gls{nft} Minter f
 According to \cite{authenahandelszeitung}, the system developed by authena is able to track the location as well as environmental data of an asset. This data is then stored securely and traceably on the blockchain. Unfortunately, the system is not open source and the company does not provide any technical insight regarding the architecture of the system.
 
 \textcite{everledger}, is a digital transparency company providing technology solutions to increase transparency in global supply chains. They use blockchain to track and verify the authenticity of high-value assets such as diamonds, wine, and art. Their platform allows users to track the entire lifecycle of an asset, from production to ownership, using a secure and transparent blockchain-based ledger. Everledger mainly focuses on fraud detection, verification, and provenance records by issuing digital certificates stored on a private blockchain.
-
+\clearpage
 \section{Discussion}
-% TODO: Discuss the 
+\label{sec:related_work_discussion}
+This literature review has shown that the conservation of artwork is a remaining concern in the art world. This concern is increased when it comes to the transportation of artworks. The integrity and health of an artwork depend on a number of factors including the environment surrounding the artwork. Besides shock and vibration, temperature and humidity are suggested to be the most sensitive parameters.
+
+With new technologies like \gls{iot} it becomes possible to continuously monitor environmental parameters. Multiple papers have already demonstrated the potential benefits of artwork monitoring. These benefits include the verification of packaging techniques and registration of any potential disturbances to the environment that could damage an artwork. We have also seen that the gathered data from artwork monitoring can be used to predict future violations and suggest actions to prevent damage.
+
+On the other hand, we have reviewed the existing literature on the opportunities of blockchain in the art world. The main benefits include increased transparency and traceability by generating a secure chain of ownership and simplified verification of authenticity.
+
+When it comes to the combination of the two technologies, we have seen that there is substantial research to be found in the area of \gls{scm}. Within \gls{scm} there often exist subprocesses that involve the transportation of assets while ensuring their integrity and health. This can be very similar to the requirements of artwork transportation. However little to no literature was found on the combination of \gls{iot} and blockchain in artwork logistics. The reviewed literature suggests that the benefits of both technologies can be combined to improve the current process of artwork transportation.
