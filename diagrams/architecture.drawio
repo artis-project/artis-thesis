@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2023-08-01T12:17:13.929Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.5 Chrome/114.0.5735.243 Electron/25.3.1 Safari/537.36" etag="Ui4zCo1_UW4UX4anGO3k" version="21.6.5" type="device">
+<mxfile host="Electron" modified="2023-08-25T16:14:36.751Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.8 Chrome/114.0.5735.289 Electron/25.5.0 Safari/537.36" etag="SKPrlm-OlmSt1_QPkCye" version="21.6.8" type="device">
   <diagram id="ueo7mvtwTdWJJ7_IZG4s" name="Seite-1">
-    <mxGraphModel dx="851" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="975" dy="731" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -195,9 +195,6 @@
         </mxCell>
         <mxCell id="oCE4v1c2VACCqcoD-HpO-1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8bd1f;strokeColor=#e8bd1f;opacity=20;arcSize=21;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="265" y="200" width="104.99" height="290" as="geometry" />
-        </mxCell>
-        <mxCell id="oCE4v1c2VACCqcoD-HpO-7" value="React" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/512px-React-icon.svg.png?20220125121207;" parent="1" vertex="1">
-          <mxGeometry x="283.24" y="309.21999999999997" width="68.51" height="59.55" as="geometry" />
         </mxCell>
         <mxCell id="oCE4v1c2VACCqcoD-HpO-8" value="Carrier" style="shape=mxgraph.signs.transportation.truck_1;html=1;pointerEvents=1;fillColor=default;strokeColor=default;verticalLabelPosition=bottom;verticalAlign=top;align=center;strokeWidth=1;shadow=0;flipH=1;" parent="1" vertex="1">
           <mxGeometry x="65" y="380" width="94.17999999999998" height="48.51999999999999" as="geometry" />
