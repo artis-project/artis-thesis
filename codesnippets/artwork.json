@@ -16,7 +16,7 @@
   }
 }
 
-{
+"artworks": {
   "owner": [integer],
   "recipient": [integer],
   "carrier": [integer],

@@ -1,6 +1,6 @@
 \chapter{Evaluation}
 \label{chap:evaluation}
-In this chapter, we evaluate different aspects of the developed system. Section \ref{sec:cost_and_performance} shows a cost and a performance analysis of the developed \gls{sc}. Section \ref{sec:field_test} concludes the analyses with a field test of a simulated artwork transportation scenario. Finally, this chapter is concluded with a discussion in Section \ref{sec:eval_discussion} To evaluate the performance of the system we also recorded the response time of each request. This can give an indicator
+In this chapter, we evaluate different aspects of the developed system. Section \ref{sec:cost_and_performance} shows a cost and performance analysis of the developed \gls{sc} and a security analysis in Section \ref{sec:security_analysis}. Section \ref{sec:field_test} concludes the analyses with a field test of a simulated artwork transportation scenario. Finally, this chapter is concluded with a discussion in Section \ref{sec:eval_discussion}.
 
 \section{Cost and Performance Analysis}
 \label{sec:cost_and_performance}
@@ -62,7 +62,7 @@ The response time of the \gls{api} calls are mostly below 10s. We could not obse
 \end{figure}
 
 \subsection*{updateArtworkData}
-Similarly, we also analyzed the updateArtworkData function. The bar on the very left of Figure \ref{fig:updateArtworkData_tx_cost} shows the average gas consumed by the function when updating the requested status. Approving the status as a different actor shows an average gas consumption of 82'662. The last two bars show the gas amount for reporting a violation from the logger and registering a carrier.
+Similarly, we also analyzed the updateArtworkData function. The bar on the very left of Figure \ref{fig:updateArtworkData_tx_cost} shows the average gas consumed by the function when updating the requested status. Approving the status as a different actor shows an average consumption of 82'662 gas. The last two bars show the gas amount for reporting a violation from the logger and registering a carrier.
 
 The cost of these transactions was estimated similarly to with the safeMint function (Table \ref{tab:updateArtworkData_tx_fees}). The results show that updating an artwork \gls{nft} is much less costly than minting it. 
 
@@ -91,17 +91,17 @@ Since the system is intended to be used by different actors in a trust-less envi
 \subsection{Compromised Logger}
 The logging device is important to the system, and a compromised device would lead to a compromised system altogether. We consider three different attack scenarios when it comes to the logger.
 \subsubsection{Software Exploitation}
-Currently, the device itself is not secured in any way. Any malicious actor could connect to the logger device and alter its software. This could include changing the violation thresholds, stopping the logging script, manipulating the local database of the readings, and more. The current system is not protected against this threat, and thus, the security risk is high.
+Currently, the device itself is not secured in any way. Any malicious actor could connect to the logger device and alter its software. This could include changing the violation thresholds, stopping the logging script, manipulating the local database of the readings, and more. Such a threat scenario compromises the integrity, confidentiality, and availability of the system. Because the current system is not protected against this threat, the security risk is high.
 \subsubsection{Hardware Exploitation}
-The recordings can also be influenced externally by exploiting the hardware components. By gaining access to the logger device, a malicious actor could influence the environmental parameters in a minimal perimeter around the sensor and falsify the readings. This could result in violations even if the artwork itself was not affected or could prevent violations even if the artwork was affected. The current system is not protected against this threat, and the security risk is high.
+The recordings can also be influenced externally by exploiting the hardware components. By gaining access to the logger device, a malicious actor could influence the environmental parameters in a minimal perimeter around the sensor and falsify the readings. This could result in violations even if the artwork itself was not affected or could prevent violations even if the artwork was affected. The integrity and availability of the system can be compromised, which poses a high-security risk.
 \subsubsection{Compromised Credentials}
-The system only allows registered actors to change the \gls{nft}. This is also true for the logger device, which authenticates the system by signing a challenge message with a private key. If the private key is leaked, a malicious actor could report violations even if none occurred. Currently, the private key is stored in an environment variable on the software. An attacker could easily retrieve the value of the private key by connecting to the logger. This indicates a high-security risk for this threat.
+The system only allows registered actors to change the \gls{nft}. This is also true for the logger device, which authenticates the system by signing a challenge message with a private key. If the private key is leaked, a malicious actor could report violations even if none occurred. Currently, the private key is stored in an environment variable on the software. An attacker could easily retrieve the value of the private key by connecting to the logger. This indicates a high-security risk for this threat by compromising the confidentiality and integrity of the system.
 
 \subsection{Compromised Smart Contract}
 A malicious actor could influence the state of the \gls{sc} by accessing it directly. The attacker would have to identify flaws in the contract code and find an exploit to manipulate artwork data. We estimate the security risk of finding a flaw in the code to be medium, as the contract was tested during development, and basic code-checking tools could not identify a vulnerability. The \gls{sc} only accepts transactions issued by the system's admin. If the admin credentials are leaked, the attacker would have unlimited access to the \gls{sc}. In the current system, the admin's private key is only stored on the artis-server. The server is deployed as a Google Cloud-run service, and the Google secret manager supplies the private key. The security risk for this threat scenario is estimated to be low because the secret manager is an industry-standard solution for managing sensitive data.
 
 \subsection{Disclosure of Data}
-The data stored on the \gls{sc} could be sensitive depending on the use case. The \gls{sc} prevents unauthorized users from reading data. However, the transactions submitted to update data can contain sensitive information. This information can be read by anyone who has access to the \gls{sc} address, admin address, or any of the actors' addresses. Because these addresses are not considered secrets, the system must disclose all data to the public. This could introduce a high-security risk for certain use cases.
+The data stored on the \gls{sc} could be sensitive depending on the use case. The \gls{sc} prevents unauthorized users from reading data. However, the transactions submitted to update data can contain sensitive information. This information can be read by anyone who has access to the \gls{sc} address, admin address, or any of the actors' addresses. Because these addresses are not considered secrets, the system is considered to disclose all transaction data to the public. This could introduce a high-security risk for certain use cases as confidentiality would be compromised.
 
 \section{Field Test}
 \label{sec:field_test}
@@ -150,7 +150,7 @@ The field test involves a minimum of five requests to the \gls{api}. If any viol
 \subsection{Cost}
 During our field test, nine transactions were issued by the \gls{api}. The cost analysis also includes deploying the \gls{sc} and minting the \gls{nft}. However, this would be a one-time cost, and its significance will shrink with the number of transportation. Table \ref{tab:field_test_tx_fees} gives an overview of the transactions and estimated costs. The costs are estimated in the same manner as in Section \ref{sec:cost_and_performance}. However, the transactions were not issued with a fixed gas price, but each transaction was estimated based on the network at the time. 
 
-The total cost of the field test mainly consists of the contract deployment. This transaction accounts for over 78\% of the total gas consumption and thus also accounts for the greatest cost factor. The variable part included in another similar transportation scenario of the same artwork amounts to around 25.85 \gls{chf} on the Ethereum network or around 0.05 \gls{chf} on the Polygon network.
+The total cost of the field test mainly consists of the contract deployment. This transaction accounts for over 78\% of the total gas consumption and thus also accounts for the greatest cost factor. The variable part included in another similar transportation scenario of the same artwork amounts to around 25.85 \gls{chf} on the Ethereum network or around 0.07 \gls{chf} on the Polygon network.
 
 \begin{table}[ht]
 \centering
@@ -181,7 +181,7 @@ The field test lasted around 52 minutes. During the transportation, the logger s
 
 \section{Discussion}
 \label{sec:eval_discussion}
-The performance and cost of the developed system depend mainly on the blockchain used as infrastructure. Such a blockchain is essential of significant importance and must be chosen with great diligence. The prototype deployed on the sepolia testnet demonstrates the influence of different factors, such as network congestion and priority fees on the time needed for a transaction to be completed. On the testnet, the average response time with a fixed gas price of 30 Gwei is reasonable and could support a real-life scenario. However, this is not representative of the mainnet.
+The performance and cost of the developed system depend mainly on the blockchain used as infrastructure. The blockchain is essential and must be chosen with great diligence. The prototype deployed on the sepolia testnet demonstrates the influence of different factors, such as network congestion and priority fees on the time needed for a transaction to be completed. On the testnet, the average response time with a fixed gas price of 30 Gwei is reasonable and could support a real-life scenario. However, this is not representative of the mainnet.
 
 However, the gas consumption of the \gls{sc} functions can be directly adapted to any block-chain running the same \gls{evm} version. The analysis shows that executing a simple scenario on the Ethereum network can be very costly. Polygon solves this issue as our cost estimation is reduced by a factor of over 422. On Ethereum, the total cost of a scenario is quite costly, but considering the artwork's potential value, we think it could be acceptable for a real-life scenario. With Polygon, the estimated total cost is minimal and acceptable.
 
