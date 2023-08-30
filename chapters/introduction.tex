@@ -1,10 +1,13 @@
 \chapter{Introduction}
 \label{chap:introduction}
-The art trade is a diverse market with a wide range of stakeholders, including artists, collectors, auction houses, and art dealers, as well as a variety of middlemen, such as promoters, preservers, archivists, and curators, to name a few. Nevertheless, the entire art world revolves around art objects, which can also come in a large variety, from statues of different materials to canvases or even bananas nailed to walls. While museums own collections, they often display artworks from private collections or a variety thereof. Consequently, requiring trustworthy logistics partners who ensure the artwork is safely transported under optimal conditions and without damage presents an excellent opportunity for \gls{iot} sensors that can monitor temperature, humidity, vibrations, and other environmental factors. Additionally, blockchain technology can be leveraged to ensure the correctness of the transportation process for all stakeholders and, in combination with art trading, to ensure and document the transfer of ownership virtually and physically, thus bringing a degree of standardization to a largely unregulated and opaque market \cite{certify}.
+The art industry has remarkable diversity, encompassing a multitude of participants, including artists, collectors, auction houses, and art dealers. Alongside these stakeholders, many intermediaries, such as promoters, conservators, archivists, and curators, contribute to the industry. Nevertheless, at its core, the art world revolves around artistic creations, spanning from sculptures, installations, and canvases to more unconventional pieces.
+
+In the realm of art, museums curate not only from their own collections but also from private art holdings or other institutions. Consequently, there arises a pressing need for reliable logistics partners capable of safeguarding art during transit, maintaining optimal conditions, and preventing any potential damage. This presents a promising opportunity for the utilization of IoT sensors, capable of monitoring factors like temperature, humidity, vibrations, and other environmental factors  \cite{certifydeliverable}. Furthermore, the integration of blockchain technology holds the potential to guarantee the accuracy and security of the transportation process for all involved parties. It also extends its utility into the realm of art trading, enabling the verification and documentation of virtual and physical ownership transfers. In doing so, it introduces an element of standardization into a market that has traditionally been characterized by its lack of regulation and opacity \cite{certifydeliverable}.
+
 
 \section{CERTIFY Project}
 \label{sec:certify}
-CERTIFY is a multi-partner research project \cite{certify}, dedicated to achieving a high level of security by developing a novel framework to manage security throughout the lifecycle of \gls{iot} devices. The project is scheduled to run from 1st October 2022 for 36 months and involves 13 partners from eight European countries. The \gls{csg} of the \gls{ifi} at \gls{uzh} is part of CERTIFY and focusing on designing and developing a blockchain-based sharing infrastructure of security information, an Over-The-Air Patch Infrastructure and the pilot for tracking and monitoring of artworks. This thesis is part of the contributions by \gls{csg} to the pilot for tracking and monitoring of artworks.
+CERTIFY is a multi-partner research project \cite{certify}, dedicated to achieving a high level of security by developing a novel framework to manage security throughout the lifecycle of \gls{iot} devices. The project is scheduled to run from 1st October 2022 for 36 months and involves 13 partners from eight European countries. The \gls{csg} of the \gls{ifi} at \gls{uzh} is part of CERTIFY and focusing on designing and developing a blockchain-based sharing infrastructure of security information, an Over-The-Air Patch Infrastructure and a pilot project for tracking and monitoring artworks during transportation. This thesis is part of the contributions by \gls{csg} to this pilot project.
 
 \section{Motivation}
 Artwork transportation has proven to be a logistical challenge in many ways \cite{artintransit}. Complying with regulatory laws of both the departure and destination country, taking out insurance on the artworks, using packaging that lowers the risk of damage, and many more. Recording all relevant transactions typically involves administrative paperwork and trust among the many parties involved \cite{artintransit}.
@@ -24,17 +27,18 @@ Finally, with the transfer of custody, the behavior of the sensor is set from st
 
 \subsection{Thesis Goals}
 \label{sec:thesis_goals}
-\begin{itemize}[font=\textbf, align=left]
-    \item[Research:] The research report should include a review of the relevant literature concerning the technologies used and include existing solutions for blockchain-based artwork tracking.
-    \item[Design on Solution Architecture:] The report should include detailed specifications and requirements for the system, including the backend and frontend.
-    \item[Solution Prototyping:] This goal covers the implementation of a prototype of the artwork tracking system. This involves working with \gls{iot} devices, sensors, and other suitable technologies. The prototype should be functional and demonstrate the key features of the system.
-    \item[Evaluation:] The system evaluation involves testing the prototype in a (simulated) real-world artwork transportation scenario. The evaluation report includes an analysis of the system's performance and an assessment of its real-world usability.
-\end{itemize}
+\textbf{Research:} The research report should include a review of the relevant literature concerning the technologies used and include existing solutions for blockchain-based artwork tracking.
+
+\textbf{Design on Solution Architecture:} The report should include detailed specifications and requirements for the system, including the backend and frontend.
+
+\textbf{Solution Prototyping:} This goal covers the implementation of a prototype of the artwork tracking system. This involves working with \gls{iot} devices, sensors, and other suitable technologies. The prototype should be functional and demonstrate the key features of the system.
+
+\textbf{Evaluation:} The system evaluation involves testing the prototype in a (simulated) real-world artwork transportation scenario. The evaluation report includes an analysis of the system's performance and an assessment of its real-world usability.
 
 \section{Methodology}
 The methodology adopted in this thesis is strategically designed to comprehensively address the objectives outlined in Section \ref{sec:thesis_goals}. This approach can be categorized into two primary phases: a literature review phase and an applied research phase.
 
-\textbf{Literature review phase:} This involves conducting a literature review to gather essential knowledge about fundamental concepts and related work in artwork tracking and blockchain and \gls{iot}. This review provides an overview of related work on tracking solutions, summarized in Section \ref{sec:related_work_discussion}. The knowledge gained will serve as a basis for the design and development of the proposed system.
+\textbf{Literature review phase:} This involves conducting a literature review to gather essential knowledge about fundamental concepts and related work in artwork tracking and blockchain and \gls{iot}. This review provides an overview of related work on tracking solutions, summarized in Section \ref{sec:related_work_discussion}. The knowledge gained serves as a basis for the design and development of the proposed system.
 \clearpage
 \textbf{Applied research phase:} The applied research phase is composed of creating and evaluating a prototype for the proposed system. It includes the design, implementation, and evaluation described below.
 

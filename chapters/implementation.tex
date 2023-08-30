@@ -5,7 +5,7 @@ This chapter highlights the implementational aspects of the system. Introducing 
 \section{artis-smartcontract}
 The \gls{sc} was written in Ethereum's native programming language Solidity \cite{solidity}. The contract was developed using hardhat \cite{hardhat}, a development environment for Ethereum. Hardhat makes developing, compiling, testing, and deploying smart contracts easy. The \gls{sc} has been deployed to the Ethereum testnet Sepolia \cite{sepolia} during development but is intended to be deployed on the mainnet in production. The Ethereum blockchain was selected due to the research group's and the author's prior experience.
 
-When the \gls{sc} is first deployed the \texttt{smartcontractAdmin} variable is set to the deploying address. This address will be the only point of access to any \gls{sc} function. It is also the account used by the server to interact with the \gls{sc} and sign transactions.
+When the \gls{sc} is first deployed, the \texttt{smartcontractAdmin} variable is set to the deploying address. This address is the only point of access to any \gls{sc} function. It is also the account used by the server to interact with the \gls{sc} and sign transactions.
 
 \lstinputlisting[
     language=Solidity,
@@ -88,7 +88,7 @@ To ensure that all \gls{sc} interaction is done through the server \gls{api} we 
 
 The \texttt{read} modifier is additionally added to each function that reads data from the \gls{sc}. We check that the wallet that authenticated a request to the server \gls{api} is registered as an actor with read permissions.
 
-Similarly, we defined the \texttt{write} modifier to check that certain \texttt{ArtworkData} fields are only modified by the owner or logger respectively. The \texttt{currentStatus} field cannot be modified at all, it is updated automatically once the actors approve a status change. The detailed permission sets of each actor can be found in Table \ref{tab:permission_sets}
+Similarly, we defined the \texttt{write} modifier to check that certain \texttt{ArtworkData} fields are only modified by the owner or logger respectively. The \texttt{currentStatus} field cannot be modified at all, it is updated automatically once the actors approve a status change. The detailed permission sets of each actor can be found in Table \ref{tab:permission_sets}.
 
 The contract makes use of one additional modifier called \texttt{exists} which simply checks if a given tokenId exists.
 
@@ -149,9 +149,9 @@ The logic behind updating the status (Figure \ref{fig:update_status}) is more co
 
 To differentiate between the status that actors want to change to and the status which is currently in place we introduced two variables: \texttt{requestedStatus} and \texttt{currentStatus}. Users can request a status change by submitting a new \texttt{requestedStatus}. If this value does not match the previous value, all approvals are reset, and the \texttt{requestedStatus} field is set to the new value. The next step is to set the approval for the actor who sent the initial update request. Because different actors must approve different status changes, we must check for the three distinct cases.
 
-If the status is requested to change from \texttt{TO\_BE\_DELIVERED} to \texttt{IN\_TRANSIT}, the carrier, and the owner must approve that change. This check is performed analogously for the change from \texttt{IN\_TRANSIT} to \texttt{DELIVERED}. Lastly, the owner decides to change from \texttt{DELIVERED} to \texttt{TO\_BE\_DELIVERED}. Any other combination of status changes is not allowed, and the transaction will be reverted.
+If the status is requested to change from \texttt{TO\_BE\_DELIVERED} to \texttt{IN\_TRANSIT}, the carrier, and the owner must approve that change. This check is performed analogously for the change from \texttt{IN\_TRANSIT} to \texttt{DELIVERED}. Lastly, the owner decides to change from \texttt{DELIVERED} to \texttt{TO\_BE\_DELIVERED}. Any other combination of status changes is not allowed, and the transaction is reverted.
 
-If the right approvals have already been made, the function will automatically update the \texttt{currentStatus} and terminate. If any approval is missing, it will terminate without updating the \texttt{currentStatus}. In that case, the actor in question must submit their request for a status update.
+If the right approvals have already been made, the function automatically updates the \texttt{currentStatus} and terminates. If any approval is missing, it terminates without updating the \texttt{currentStatus}. In that case, the actor in question must submit their request for a status update.
 
 \subsubsection{getArtworkData}
 The function to retrieve data about an artwork is the simplest one. It merely returns the \texttt{ArtworkData} object mapped to the requested artwork \gls{id}. To easily convert the returned tuple to an object using the contract \gls{abi}, each property is mapped to the tuple entry specified in the function signature, visible in Listing \ref{lst:scget}.
@@ -166,7 +166,7 @@ The function to retrieve data about an artwork is the simplest one. It merely re
 
 \clearpage
 \section{artis-server}
-The server is the central part of the system; it connects the end users to the \gls{sc}. The responsibilities of the server can be separated into three layers. The files of the server's directory structure depicted in Figure \ref{fig:server_directory_structure} and the corresponding code will be explained in the next sections. The server code is implemented in Python using a variety of libraries that will be addressed later on.
+The server is the central part of the system; it connects the end users to the \gls{sc}. The responsibilities of the server can be separated into three layers. The files of the server's directory structure are depicted in Figure \ref{fig:server_directory_structure} and the corresponding code is explained in the next sections. The server code is implemented in Python using a variety of libraries that are addressed later on.
 
 \begin{figure}
     \centering
@@ -177,7 +177,7 @@ The server is the central part of the system; it connects the end users to the \
 
 \subsection{Authentication Layer}
 \label{sec:authentication_layer}
-To implement the authentication flow described in section \ref{sec:authentication}, we defined an \texttt{Authenticator} class, which handles the server-side logic. This class implements functions provided by the third web library \cite{thirdweb} but has been adapted to fit our specific use case. The functionality described in this section is exposed by the \gls{api} via the endpoints listed in Table \ref{tab:authentication_endpoints}
+To implement the authentication flow described in section \ref{sec:authentication}, we defined an \texttt{Authenticator} class, which handles the server-side logic. This class implements functions provided by the third web library \cite{thirdweb} but has been adapted to fit our specific use case. The functionality described in this section is exposed by the \gls{api} via the endpoints listed in Table \ref{tab:authentication_endpoints}.
 
 \lstinputlisting[
     language=Python,
@@ -200,7 +200,7 @@ The method described in Listing \ref{lst:authpayload} constructs a dictionary wi
 
 The signed message is then sent back and verified by the \texttt{verify} method listed in Listing \ref{lst:authlogin}. After reconstructing the challenge message, the method recovers the account address that was used for the signature. If it matches the address specified in Line 7 of Listing \ref{lst:authpayload} the authentication request is valid. This proves that the user who sent the request has ownership over the specified account. To recover the address, the python web3 library was used \cite{web3python}.
 
-If the authentication request succeeds the client will issue a \gls{jwt} signed by the server wallet. This token is then used to authenticate further requests until it expires. The \gls{jwt}'s signature and expiration date are verified upon each request by the \texttt{Authenticator} class. The \texttt{Authenticator} exposes this functionality with the \texttt{/auth/login} endpoint.
+If the authentication request succeeds the server issues a \gls{jwt} signed by the server wallet. This token is then used by the client to authenticate further requests until it expires. The \gls{jwt}'s signature and expiration date are verified upon each request by the \texttt{Authenticator} class. The \texttt{Authenticator} exposes this functionality with the \texttt{/auth/login} endpoint.
 \clearpage
 
 Two additional authentication endpoints are exposed by the \gls{api}. \texttt{/auth/logout} closes the session and \texttt{/auth/user} returns information about the subject of a \gls{jwt}. It can be queried to check if the session is still active and react accordingly on the client side.
@@ -247,7 +247,7 @@ The \gls{json} schema of the artwork resource is shown in Listing \ref{lst:artwo
     mathescape=true
 ]{codesnippets/artwork.json}
 
-A GET request to \texttt{/artworks} will return the artwork IDs where the requester is registered as an actor. This response is shown in Listing \ref{lst:getall}. A POST request to the same endpoint will return \lstinline[language=JSON]!{ "tokenId": integer }! with the newly generated \gls{id}.
+A GET request to \texttt{/artworks} returns the artwork \glspl{id} where the requester is registered as an actor. This response is shown in Listing \ref{lst:getall}. A POST request to the same endpoint returns \lstinline[language=JSON]!{ "tokenId": integer }! with the newly generated \gls{id}.
 
 \lstinputlisting[
     language=JSON,
@@ -270,7 +270,7 @@ To build the \gls{api} application we used Flask \cite{flask}. The entry point o
 The application layer connects to the \gls{sc} and submits the transactions needed to fulfill the \gls{api} request. To do this we are using the python web3 library \cite{web3python}. This functionality is defined in the \texttt{/src/smartcontract/ArtworkConnector.py} file. It defines a class that extends the \texttt{SmartContractConnector} abstract class. The \texttt{SmartContractConnector} class contains code that is generally necessary to connect to a \gls{sc}. This includes setting up the Web3 provider, as well as the account to submit the transactions, and adding some middleware. Additionally, we decided to define two \textit{abstractmethods} that fetch the contract address and contract \gls{abi} dynamically. This ensures the \gls{api} is always connected to the newest contract. In our case, we used GitHub variables to store the contract address and the Etherscan \cite{etherscan} \gls{api} to fetch the \gls{abi}. With this setup, we built an extensible platform that can add endpoints to connect to additional \glspl{sc} more easily. 
 
 The \texttt{ArtworkConnector} class has the same interface as the solidity contract. As shown in Listing \ref{lst:artworkconnector}, each public method directly connects to a \gls{sc} method. Web3.py provides a simple-to-use smart contract proxy object which we stored in the class variable \texttt{self.\_contract}. This object makes all the contract functions available with the \texttt{functions} property. To call a contract function it suffices to execute \lstinline[language=Python]!self._contract.functions.<function_name>(<input>).call()!.
-This will return the value from the \gls{sc} and can more or less be directly returned to the user. If the function mutates the state of the contract, we need to use \lstinline[language=Python]!.transact()! and a transaction hash is returned instead. We use this transaction hash to wait for the transaction receipt and extract the data from the emitted events. This is done by the helper function \texttt{self.\_handleEvent}.
+This returns the value from the \gls{sc} and can more or less be directly returned to the user. If the function mutates the state of the contract, we need to use \lstinline[language=Python]!.transact()! and a transaction hash is returned instead. We use this transaction hash to wait for the transaction receipt and extract the data from the emitted events. This is done by the helper function \texttt{self.\_handleEvent}.
 
 \lstinputlisting[
     language=Python,
@@ -292,7 +292,7 @@ The decision for this device and sensor is based on simplicity, flexibility, and
 
 To read data from the DHT-22 sensor, we used an existing library called "Rockfruit Python DHT" \cite{rockfruitpythondht} that we adapted slightly to work with our board. The library provides a function with the signature \texttt{read\_retry(sensor, pin, retries=15, delay\_seconds=2)}. This method reads data from the DHT sensor of the specified type (in our case 22) on the specified \gls{gpio} pin. It returns a tuple of humidity (as a floating point value in percent) and temperature (as a floating point value in Celsius). 
 
-The function will attempt to read multiple times (up to the specified retries) until a reading can be registered. If no reading can be registered after the number of retries, the function will return \texttt{(None, None)}. The default delay between retries is two seconds but can be overridden.
+The function attempts to read multiple times (up to the specified retries) until a reading can be registered. If no reading can be registered after the number of retries, the function returns \texttt{(None, None)}. The default delay between retries is two seconds but can be overridden.
 
 \begin{figure}[ht]
     \centering
@@ -392,5 +392,5 @@ The artwork page shows colorful tiles representing artworks. Each tile is labele
     \end{minipage}
 \end{figure}
 
-To create a new artwork \gls{nft}, the user can click on the transparent tile at the bottom. This will open up a modal where the user can enter details about the artwork (Figure \ref{fig:mint_modal}). To view more details about an existing artwork the user can click on a tile to open up the detail view shown in Figure \ref{fig:artwork_detail}. This view displays important information like the status of the artwork, the role the user is registered as, and the timestamp of the most recent violation if any occurred. Further, the user can edit values by switching on the edit mode with the switch on the top right.  
+To create a new artwork \gls{nft}, the user can click on the transparent tile at the bottom. This opens a modal where the user can enter details about the artwork (Figure \ref{fig:mint_modal}). To view more details about an existing artwork the user can click on a tile to open up the detail view shown in Figure \ref{fig:artwork_detail}. This view displays important information like the status of the artwork, the role the user is registered as, and the timestamp of the most recent violation if any occurred. Further, the user can edit values by switching on the edit mode with the switch on the top right.  
 
